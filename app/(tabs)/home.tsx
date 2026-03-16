@@ -1,19 +1,18 @@
+import { Ionicons } from "@expo/vector-icons";
+import { router } from "expo-router";
 import React from "react";
 import { Pressable, Text, View } from "react-native";
-import { router } from "expo-router";
-import { Ionicons } from "@expo/vector-icons";
-import { BlurView } from "expo-blur";
 
-import { Screen } from "../../src/components/ui/Screen";
+import { CourseCard } from "../../src/components/cards/CourseCard";
+import { OpportunityCard } from "../../src/components/cards/OpportunityCard";
+import { StatCard } from "../../src/components/cards/StatCard";
 import { AnimatedEntrance } from "../../src/components/ui/AnimatedEntrance";
 import { Avatar } from "../../src/components/ui/Avatar";
 import { GlassCard } from "../../src/components/ui/GlassCard";
-import { SectionTitle } from "../../src/components/ui/SectionTitle";
-import { StatCard } from "../../src/components/cards/StatCard";
-import { OpportunityCard } from "../../src/components/cards/OpportunityCard";
-import { CourseCard } from "../../src/components/cards/CourseCard";
-import { useLaunchpad } from "../../src/context/LaunchpadContext";
 import { GradientButton } from "../../src/components/ui/GradientButton";
+import { Screen } from "../../src/components/ui/Screen";
+import { SectionTitle } from "../../src/components/ui/SectionTitle";
+import { useLaunchpad } from "../../src/context/LaunchpadContext";
 
 export default function HomeScreen() {
   const {
@@ -33,10 +32,15 @@ export default function HomeScreen() {
         <AnimatedEntrance>
           <View className="mb-6 flex-row items-center justify-between">
             <View className="flex-1 pr-4">
-              <Text className="text-sm uppercase tracking-[2px] text-blue-300">Launchpad</Text>
-              <Text className="mt-2 text-3xl font-black text-white">Hi, {profile.name.split(" ")[0]}</Text>
+              <Text className="text-sm uppercase tracking-[2px] text-blue-300">
+                Launchpad
+              </Text>
+              <Text className="mt-2 text-3xl font-black text-white">
+                Hi, {profile.name.split(" ")[0]}
+              </Text>
               <Text className="mt-2 text-base leading-7 text-slate-400">
-                Your profile is looking strong. Here are the smartest next moves for this week.
+                Your profile is looking strong. Here are the smartest next moves
+                for this week.
               </Text>
             </View>
             <Avatar uri={profile.avatar} name={profile.name} size={54} />
@@ -44,11 +48,7 @@ export default function HomeScreen() {
         </AnimatedEntrance>
 
         <AnimatedEntrance delay={80}>
-          <BlurView
-            intensity={18}
-            tint="dark"
-            style={{ borderRadius: 28, overflow: "hidden", marginBottom: 24 }}
-          >
+          <View className="mb-6 rounded-[28px] border border-white/10 bg-slate-900 px-5 py-5">
             <View className="border border-white/10 bg-blue-500/10 px-5 py-5">
               <View className="flex-row items-center justify-between">
                 <View className="flex-1 pr-4">
@@ -59,7 +59,8 @@ export default function HomeScreen() {
                     You are close to a recruiter-ready CV.
                   </Text>
                   <Text className="mt-3 text-sm leading-6 text-slate-200">
-                    Add one quantified result to your internship experience and apply to 2 high-match roles.
+                    Add one quantified result to your internship experience and
+                    apply to 2 high-match roles.
                   </Text>
                 </View>
                 <View className="rounded-2xl bg-white/10 p-4">
@@ -73,16 +74,23 @@ export default function HomeScreen() {
                 <Text className="text-sm font-semibold text-white">84%</Text>
               </View>
             </View>
-          </BlurView>
+          </View>
         </AnimatedEntrance>
 
         <AnimatedEntrance delay={120}>
           <View className="mb-2">
-            <SectionTitle title="Performance snapshot" subtitle="Quick health check across your academic and opportunity profile." />
+            <SectionTitle
+              title="Performance snapshot"
+              subtitle="Quick health check across your academic and opportunity profile."
+            />
           </View>
           <View className="mb-6 flex-row">
             {quickStats.map((item) => (
-              <StatCard key={item.label} label={item.label} value={item.value} />
+              <StatCard
+                key={item.label}
+                label={item.label}
+                value={item.value}
+              />
             ))}
           </View>
         </AnimatedEntrance>
@@ -102,9 +110,13 @@ export default function HomeScreen() {
             <GlassCard key={tip} className="mb-4">
               <View className="flex-row items-start">
                 <View className="mr-4 mt-1 h-7 w-7 items-center justify-center rounded-full bg-blue-500/15">
-                  <Text className="text-sm font-bold text-blue-200">{index + 1}</Text>
+                  <Text className="text-sm font-bold text-blue-200">
+                    {index + 1}
+                  </Text>
                 </View>
-                <Text className="flex-1 text-sm leading-6 text-slate-300">{tip}</Text>
+                <Text className="flex-1 text-sm leading-6 text-slate-300">
+                  {tip}
+                </Text>
               </View>
             </GlassCard>
           ))}
@@ -133,7 +145,10 @@ export default function HomeScreen() {
         </AnimatedEntrance>
 
         <AnimatedEntrance delay={340}>
-          <SectionTitle title="This semester" subtitle="Courses feeding directly into your product and AI career path." />
+          <SectionTitle
+            title="This semester"
+            subtitle="Courses feeding directly into your product and AI career path."
+          />
           <View className="mb-6 flex-row">
             {courses.map((course) => (
               <CourseCard key={course.id} item={course} />
@@ -143,9 +158,12 @@ export default function HomeScreen() {
 
         <AnimatedEntrance delay={420}>
           <GlassCard className="overflow-hidden">
-            <Text className="text-xl font-bold text-white">Need fast focus?</Text>
+            <Text className="text-xl font-bold text-white">
+              Need fast focus?
+            </Text>
             <Text className="mt-2 text-sm leading-6 text-slate-300">
-              Open your roadmap and follow the next milestone that improves your employability score.
+              Open your roadmap and follow the next milestone that improves your
+              employability score.
             </Text>
             <View className="mt-5">
               <GradientButton
