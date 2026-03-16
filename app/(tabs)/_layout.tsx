@@ -1,35 +1,74 @@
-import { Tabs } from 'expo-router';
-import React from 'react';
+import React from "react";
+import { Tabs, router } from "expo-router";
+import { Pressable, Text, View } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
 
-import { HapticTab } from '@/components/haptic-tab';
-import { IconSymbol } from '@/components/ui/icon-symbol';
-import { Colors } from '@/constants/theme';
-import { useColorScheme } from '@/hooks/use-color-scheme';
+import { useLaunchpad } from "../../src/context/LaunchpadContext";
 
-export default function TabLayout() {
-  const colorScheme = useColorScheme();
+export default function TabsLayout() {
+  const { unreadCount } = useLaunchpad();
 
   return (
     <Tabs
-      screenOptions={{
-        tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
-        headerShown: false,
-        tabBarButton: HapticTab,
-      }}>
-      <Tabs.Screen
-        name="index"
-        options={{
-          title: 'Home',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="house.fill" color={color} />,
-        }}
-      />
-      <Tabs.Screen
-        name="explore"
-        options={{
-          title: 'Explore',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="paperplane.fill" color={color} />,
-        }}
-      />
+      screenOptions={({ route }) => ({
+        headerStyle: { backgroundColor: "#020617" },
+        headerShadowVisible: false,
+        headerTintColor: "#F8FAFC",
+        tabBarStyle: {
+          backgroundColor: "#020617",
+          borderTopColor: "rgba(255,255,255,0.06)",
+          height: 82,
+          paddingTop: 8,
+        },
+        tabBarActiveTintColor: "#60A5FA",
+        tabBarInactiveTintColor: "#64748B",
+        headerRight: () => (
+          <Pressable
+            onPress={() => router.push("/notifications")}
+            style={{ marginRight: 18 }}
+          >
+            <Ionicons name="notifications-outline" size={22} color="#E2E8F0" />
+            {unreadCount ? (
+              <View
+                pointerEvents="none"
+                style={{
+                  position: "absolute",
+                  right: -8,
+                  top: -6,
+                  backgroundColor: "#2563EB",
+                  minWidth: 18,
+                  height: 18,
+                  borderRadius: 9,
+                  alignItems: "center",
+                  justifyContent: "center",
+                  paddingHorizontal: 4,
+                }}
+              >
+                <Text style={{ color: "white", fontSize: 10, fontWeight: "700" }}>
+                  {Math.min(unreadCount, 9)}
+                </Text>
+              </View>
+            ) : null}
+          </Pressable>
+        ),
+        tabBarIcon: ({ color, focused }) => {
+          const iconMap: Record<string, keyof typeof Ionicons.glyphMap> = {
+            home: focused ? "home" : "home-outline",
+            opportunities: focused ? "briefcase" : "briefcase-outline",
+            roadmap: focused ? "sparkles" : "sparkles-outline",
+            cv: focused ? "document-text" : "document-text-outline",
+            profile: focused ? "person-circle" : "person-circle-outline",
+          };
+
+          return <Ionicons name={iconMap[route.name]} size={22} color={color} />;
+        },
+      })}
+    >
+      <Tabs.Screen name="home" options={{ title: "Home", headerShown: false }} />
+      <Tabs.Screen name="opportunities" options={{ title: "Matches", headerShown: false }} />
+      <Tabs.Screen name="roadmap" options={{ title: "Roadmap", headerShown: false }} />
+      <Tabs.Screen name="cv" options={{ title: "CV", headerShown: false }} />
+      <Tabs.Screen name="profile" options={{ title: "Profile", headerShown: false }} />
     </Tabs>
   );
 }
