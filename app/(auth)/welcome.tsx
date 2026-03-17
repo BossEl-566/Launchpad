@@ -111,9 +111,7 @@ export default function WelcomeScreen() {
               onPress={() => router.push("/(tabs)/home")}
               className="items-center py-3"
             >
-              <Text className="font-medium text-slate-400">
-                Skip auth and view the product
-              </Text>
+              <Text className="font-medium text-slate-400">Skip for now</Text>
             </Pressable>
           </View>
         </AnimatedEntrance>
