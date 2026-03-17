@@ -1,15 +1,15 @@
 import "../global.css";
 
-import React from "react";
 import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
+import React from "react";
 
 import { LaunchpadProvider } from "../src/context/LaunchpadContext";
 
 export default function RootLayout() {
   return (
     <LaunchpadProvider>
-      <StatusBar style="light" />
+      <StatusBar style="dark" />
       <Stack
         screenOptions={{
           headerShown: false,
