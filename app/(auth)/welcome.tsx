@@ -1,12 +1,12 @@
+import { Ionicons } from "@expo/vector-icons";
+import { router } from "expo-router";
 import React from "react";
 import { Pressable, Text, View } from "react-native";
-import { router } from "expo-router";
-import { Ionicons } from "@expo/vector-icons";
 
-import { Screen } from "../../src/components/ui/Screen";
+import { AnimatedEntrance } from "../../src/components/ui/AnimatedEntrance";
 import { GlassCard } from "../../src/components/ui/GlassCard";
 import { GradientButton } from "../../src/components/ui/GradientButton";
-import { AnimatedEntrance } from "../../src/components/ui/AnimatedEntrance";
+import { Screen } from "../../src/components/ui/Screen";
 
 const features = [
   {
@@ -36,7 +36,9 @@ export default function WelcomeScreen() {
               <Text className="text-xl font-black text-white">L</Text>
             </View>
             <View>
-              <Text className="text-2xl font-black tracking-tight text-white">Launchpad</Text>
+              <Text className="text-2xl font-black tracking-tight text-white">
+                Launchpad
+              </Text>
               <Text className="text-sm text-slate-400">
                 Build from classroom to career
               </Text>
@@ -51,8 +53,8 @@ export default function WelcomeScreen() {
                 Become market-ready before graduation.
               </Text>
               <Text className="mt-4 text-base leading-7 text-slate-300">
-                A student-focused employability app that tracks growth, recommends the next move,
-                and turns real experiences into a polished profile.
+                Launchpad helps you build a strong CV, discover opportunities,
+                and get AI-powered personalized guidance every step of the way.
               </Text>
             </View>
             <View className="px-5 py-5">
@@ -86,8 +88,12 @@ export default function WelcomeScreen() {
                     <Ionicons name={feature.icon} size={20} color="#60A5FA" />
                   </View>
                   <View className="flex-1">
-                    <Text className="text-lg font-semibold text-white">{feature.title}</Text>
-                    <Text className="mt-2 text-sm leading-6 text-slate-300">{feature.text}</Text>
+                    <Text className="text-lg font-semibold text-white">
+                      {feature.title}
+                    </Text>
+                    <Text className="mt-2 text-sm leading-6 text-slate-300">
+                      {feature.text}
+                    </Text>
                   </View>
                 </View>
               </GlassCard>
@@ -97,9 +103,17 @@ export default function WelcomeScreen() {
 
         <AnimatedEntrance delay={420}>
           <View className="mt-3 gap-3">
-            <GradientButton label="Start demo" onPress={() => router.push("/(auth)/login")} />
-            <Pressable onPress={() => router.push("/(tabs)/home")} className="items-center py-3">
-              <Text className="font-medium text-slate-400">Skip auth and view the product</Text>
+            <GradientButton
+              label="Start demo"
+              onPress={() => router.push("/(auth)/login")}
+            />
+            <Pressable
+              onPress={() => router.push("/(tabs)/home")}
+              className="items-center py-3"
+            >
+              <Text className="font-medium text-slate-400">
+                Skip auth and view the product
+              </Text>
             </Pressable>
           </View>
         </AnimatedEntrance>
