@@ -1,17 +1,17 @@
-import React from "react";
-import { Stack } from "expo-router";
-import { Text, View } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import { Stack } from "expo-router";
+import React from "react";
+import { Text, View } from "react-native";
 
-import { Screen } from "../src/components/ui/Screen";
 import { GlassCard } from "../src/components/ui/GlassCard";
-import { SectionTitle } from "../src/components/ui/SectionTitle";
 import { GradientButton } from "../src/components/ui/GradientButton";
+import { Screen } from "../src/components/ui/Screen";
+import { SectionTitle } from "../src/components/ui/SectionTitle";
 
 const conversation = [
   {
     role: "AI Coach",
-    text: "You are strongest in mobile product implementation. For the next 30 days, focus on one polished case study and two high-match internship applications.",
+    text: "Hello! I'm an AI coach. How can I help you today.",
   },
   {
     role: "You",
@@ -47,23 +47,34 @@ export default function AiCoachScreen() {
             className={`mb-4 ${item.role === "You" ? "border-blue-400/20" : ""}`}
           >
             <View className="mb-3 flex-row items-center">
-              <View className={`mr-3 rounded-2xl p-3 ${item.role === "You" ? "bg-blue-500/15" : "bg-white/5"}`}>
+              <View
+                className={`mr-3 rounded-2xl p-3 ${item.role === "You" ? "bg-blue-500/15" : "bg-white/5"}`}
+              >
                 <Ionicons
-                  name={item.role === "You" ? "person-outline" : "sparkles-outline"}
+                  name={
+                    item.role === "You" ? "person-outline" : "sparkles-outline"
+                  }
                   size={18}
                   color={item.role === "You" ? "#60A5FA" : "#E2E8F0"}
                 />
               </View>
-              <Text className="text-base font-semibold text-white">{item.role}</Text>
+              <Text className="text-base font-semibold text-white">
+                {item.role}
+              </Text>
             </View>
-            <Text className="text-sm leading-7 text-slate-300">{item.text}</Text>
+            <Text className="text-sm leading-7 text-slate-300">
+              {item.text}
+            </Text>
           </GlassCard>
         ))}
 
         <GlassCard>
-          <Text className="text-lg font-semibold text-white">Next backend hook</Text>
+          <Text className="text-lg font-semibold text-white">
+            Next backend hook
+          </Text>
           <Text className="mt-3 text-sm leading-6 text-slate-300">
-            Replace this with streamed chat responses, recommendation explanations, or personalized application advice.
+            Replace this with streamed chat responses, recommendation
+            explanations, or personalized application advice.
           </Text>
 
           <View className="mt-5">
