@@ -1,13 +1,15 @@
+import { Ionicons } from "@expo/vector-icons";
 import React from "react";
 import { Text, View } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
 
+import { AnimatedEntrance } from "../../src/components/ui/AnimatedEntrance";
+import { GlassCard } from "../../src/components/ui/GlassCard";
 import { Screen } from "../../src/components/ui/Screen";
 import { SectionTitle } from "../../src/components/ui/SectionTitle";
-import { GlassCard } from "../../src/components/ui/GlassCard";
 import { Tag } from "../../src/components/ui/Tag";
 import { useLaunchpad } from "../../src/context/LaunchpadContext";
-import { AnimatedEntrance } from "../../src/components/ui/AnimatedEntrance";
+
+// This is a simple AI-generated career roadmap screen that surfaces suggested milestones and electives based on the user's profile and target role. It can be expanded in the future with more personalized insights, links to resources, and integration with calendar and task management features.
 
 export default function RoadmapScreen() {
   const { profile, milestones, electiveSuggestions } = useLaunchpad();
@@ -25,18 +27,28 @@ export default function RoadmapScreen() {
             <Text className="text-xs uppercase tracking-[1.8px] text-blue-300">
               Target direction
             </Text>
-            <Text className="mt-3 text-2xl font-black text-white">{profile.goal}</Text>
+            <Text className="mt-3 text-2xl font-black text-white">
+              {profile.goal}
+            </Text>
             <Text className="mt-3 text-sm leading-6 text-slate-300">
-              Focus on product-minded engineering roles where your UI strength, communication, and mobile experience create immediate value.
+              Focus on product-minded engineering roles where your UI strength,
+              communication, and mobile experience create immediate value.
             </Text>
           </GlassCard>
         </AnimatedEntrance>
 
         <AnimatedEntrance delay={120}>
-          <SectionTitle title="Milestones" subtitle="Suggested steps to move from student builder to strong candidate." />
+          <SectionTitle
+            title="Milestones"
+            subtitle="Suggested steps to move from student builder to strong candidate."
+          />
           {milestones.map((item, index) => {
             const tone =
-              item.status === "Done" ? "text-emerald-300" : item.status === "Active" ? "text-blue-300" : "text-slate-500";
+              item.status === "Done"
+                ? "text-emerald-300"
+                : item.status === "Active"
+                  ? "text-blue-300"
+                  : "text-slate-500";
 
             return (
               <GlassCard className="mb-4" key={item.id}>
@@ -47,8 +59,8 @@ export default function RoadmapScreen() {
                         item.status === "Done"
                           ? "bg-emerald-500/15"
                           : item.status === "Active"
-                          ? "bg-blue-500/15"
-                          : "bg-white/5"
+                            ? "bg-blue-500/15"
+                            : "bg-white/5"
                       }`}
                     >
                       <Ionicons
@@ -56,11 +68,17 @@ export default function RoadmapScreen() {
                           item.status === "Done"
                             ? "checkmark-outline"
                             : item.status === "Active"
-                            ? "flash-outline"
-                            : "lock-closed-outline"
+                              ? "flash-outline"
+                              : "lock-closed-outline"
                         }
                         size={18}
-                        color={item.status === "Done" ? "#34D399" : item.status === "Active" ? "#60A5FA" : "#94A3B8"}
+                        color={
+                          item.status === "Done"
+                            ? "#34D399"
+                            : item.status === "Active"
+                              ? "#60A5FA"
+                              : "#94A3B8"
+                        }
                       />
                     </View>
                     {index !== milestones.length - 1 ? (
@@ -69,10 +87,23 @@ export default function RoadmapScreen() {
                   </View>
 
                   <View className="flex-1">
-                    <Text className={`text-base font-semibold ${tone}`}>{item.title}</Text>
-                    <Text className="mt-2 text-sm leading-6 text-slate-300">{item.blurb}</Text>
+                    <Text className={`text-base font-semibold ${tone}`}>
+                      {item.title}
+                    </Text>
+                    <Text className="mt-2 text-sm leading-6 text-slate-300">
+                      {item.blurb}
+                    </Text>
                     <View className="mt-3">
-                      <Tag label={item.status} tone={item.status === "Done" ? "green" : item.status === "Active" ? "blue" : "default"} />
+                      <Tag
+                        label={item.status}
+                        tone={
+                          item.status === "Done"
+                            ? "green"
+                            : item.status === "Active"
+                              ? "blue"
+                              : "default"
+                        }
+                      />
                     </View>
                   </View>
                 </View>
@@ -82,11 +113,18 @@ export default function RoadmapScreen() {
         </AnimatedEntrance>
 
         <AnimatedEntrance delay={220}>
-          <SectionTitle title="Elective recommendations" subtitle="These electives support the path you selected." />
+          <SectionTitle
+            title="Elective recommendations"
+            subtitle="These electives support the path you selected."
+          />
           {electiveSuggestions.map((item) => (
             <GlassCard key={item.id} className="mb-4">
-              <Text className="text-lg font-semibold text-white">{item.title}</Text>
-              <Text className="mt-2 text-sm leading-6 text-slate-300">{item.reason}</Text>
+              <Text className="text-lg font-semibold text-white">
+                {item.title}
+              </Text>
+              <Text className="mt-2 text-sm leading-6 text-slate-300">
+                {item.reason}
+              </Text>
             </GlassCard>
           ))}
         </AnimatedEntrance>
