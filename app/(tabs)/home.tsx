@@ -39,8 +39,7 @@ export default function HomeScreen() {
                 Hi, {profile.name.split(" ")[0]}
               </Text>
               <Text className="mt-2 text-base leading-7 text-slate-400">
-                Your profile is looking strong. Here are the smartest next moves
-                for this week.
+                Welcome to your Launchpad dashboard.
               </Text>
             </View>
             <Avatar uri={profile.avatar} name={profile.name} size={54} />
