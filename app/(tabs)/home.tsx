@@ -14,6 +14,8 @@ import { Screen } from "../../src/components/ui/Screen";
 import { SectionTitle } from "../../src/components/ui/SectionTitle";
 import { useLaunchpad } from "../../src/context/LaunchpadContext";
 
+// This is the main dashboard screen that users see when they open the app. It surfaces personalized AI insights, featured opportunity matches, course recommendations, and quick stats to give users a snapshot of their career readiness and next steps.
+
 export default function HomeScreen() {
   const {
     profile,
