@@ -14,11 +14,11 @@ import {
   Microscope,
   Search,
   Sparkles,
-  Users,
-  X,
+  X
 } from "lucide-react-native";
 import React, { useMemo, useState } from "react";
 import {
+  Image,
   Modal,
   Pressable,
   ScrollView,
@@ -55,6 +55,7 @@ type InterestGroup = {
   members: string;
   accent: [string, string, ...string[]];
   icon: LucideIcon;
+  logo: string;
 };
 
 const interestGroups: InterestGroup[] = [
@@ -65,6 +66,7 @@ const interestGroups: InterestGroup[] = [
     members: "4.8k members",
     accent: ["#2563EB", "#1D4ED8", "#1E3A8A"],
     icon: Sparkles,
+    logo: "https://images.unsplash.com/photo-1558655146-d09347e92766?q=80&w=300&auto=format&fit=crop",
   },
   {
     id: "2",
@@ -73,6 +75,7 @@ const interestGroups: InterestGroup[] = [
     members: "2.1k members",
     accent: ["#0F766E", "#0D9488", "#115E59"],
     icon: Microscope,
+    logo: "https://images.unsplash.com/photo-1532187643603-ba119ca4109e?q=80&w=300&auto=format&fit=crop",
   },
   {
     id: "3",
@@ -81,6 +84,16 @@ const interestGroups: InterestGroup[] = [
     members: "3.4k members",
     accent: ["#7C3AED", "#6D28D9", "#4C1D95"],
     icon: GraduationCap,
+    logo: "https://images.unsplash.com/photo-1523050854058-8df90110c9f1?q=80&w=300&auto=format&fit=crop",
+  },
+  {
+    id: "4",
+    name: "Volunteer & Impact Network",
+    subtitle: "NGOs, service roles, outreach, social impact",
+    members: "1.9k members",
+    accent: ["#BE185D", "#DB2777", "#9D174D"],
+    icon: HeartHandshake,
+    logo: "https://images.unsplash.com/photo-1529156069898-49953e39b3ac?q=80&w=300&auto=format&fit=crop",
   },
 ];
 
@@ -157,30 +170,42 @@ function getTypeTheme(type: string): {
   }
 }
 
-function CompanyMark({ company, type }: { company: string; type: string }) {
-  const initials = (company || "LP")
-    .split(" ")
-    .slice(0, 2)
-    .map((part) => part[0])
-    .join("")
-    .toUpperCase();
+function getCompanyLogo(company: string) {
+  const name = (company || "").toLowerCase();
 
+  if (name.includes("google")) return "https://logo.clearbit.com/google.com";
+  if (name.includes("microsoft"))
+    return "https://logo.clearbit.com/microsoft.com";
+  if (name.includes("amazon")) return "https://logo.clearbit.com/amazon.com";
+  if (name.includes("meta")) return "https://logo.clearbit.com/meta.com";
+  if (name.includes("spotify")) return "https://logo.clearbit.com/spotify.com";
+  if (name.includes("netflix")) return "https://logo.clearbit.com/netflix.com";
+  if (name.includes("accenture"))
+    return "https://logo.clearbit.com/accenture.com";
+  if (name.includes("unicef")) return "https://logo.clearbit.com/unicef.org";
+  if (name.includes("unesco")) return "https://logo.clearbit.com/unesco.org";
+  if (name.includes("giz")) return "https://logo.clearbit.com/giz.de";
+  if (name.includes("kpmg")) return "https://logo.clearbit.com/kpmg.com";
+  if (name.includes("deloitte"))
+    return "https://logo.clearbit.com/deloitte.com";
+  if (name.includes("ey")) return "https://logo.clearbit.com/ey.com";
+  if (name.includes("pwc")) return "https://logo.clearbit.com/pwc.com";
+
+  const encoded = encodeURIComponent(company || "Launchpad");
+  return `https://ui-avatars.com/api/?name=${encoded}&background=0F172A&color=FFFFFF&size=128&bold=true`;
+}
+
+function CompanyLogo({ company, type }: { company: string; type: string }) {
   const theme = getTypeTheme(type);
+  const uri = getCompanyLogo(company);
 
   return (
-    <LinearGradient
-      colors={["#0F172A", theme.iconBg]}
-      start={{ x: 0, y: 0 }}
-      end={{ x: 1, y: 1 }}
-      className="h-14 w-14 items-center justify-center rounded-[18px] border border-white/10"
+    <View
+      className="h-14 w-14 overflow-hidden rounded-[18px] border border-white/10"
+      style={{ backgroundColor: theme.iconBg }}
     >
-      <Text
-        className="text-[16px] font-extrabold"
-        style={{ color: theme.iconColor }}
-      >
-        {initials}
-      </Text>
-    </LinearGradient>
+      <Image source={{ uri }} resizeMode="cover" className="h-full w-full" />
+    </View>
   );
 }
 
@@ -211,7 +236,48 @@ function FilterChip({
   );
 }
 
-function GroupCard({ item }: { item: InterestGroup }) {
+function SectionTitleRow({
+  title,
+  subtitle,
+  actionLabel,
+  onActionPress,
+}: {
+  title: string;
+  subtitle?: string;
+  actionLabel?: string;
+  onActionPress?: () => void;
+}) {
+  return (
+    <View className="mb-4 flex-row items-end justify-between">
+      <View className="flex-1 pr-4">
+        <Text className="text-[20px] font-extrabold tracking-tight text-white">
+          {title}
+        </Text>
+        {subtitle ? (
+          <Text className="mt-1 text-[14px] leading-6 text-[#8A94A7]">
+            {subtitle}
+          </Text>
+        ) : null}
+      </View>
+
+      {actionLabel ? (
+        <Pressable onPress={onActionPress}>
+          <Text className="text-[13px] font-extrabold uppercase tracking-[1px] text-[#60A5FA]">
+            {actionLabel}
+          </Text>
+        </Pressable>
+      ) : null}
+    </View>
+  );
+}
+
+function GroupCard({
+  item,
+  onJoin,
+}: {
+  item: InterestGroup;
+  onJoin?: () => void;
+}) {
   const Icon = item.icon;
 
   return (
@@ -220,7 +286,7 @@ function GroupCard({ item }: { item: InterestGroup }) {
       start={{ x: 0, y: 0 }}
       end={{ x: 1, y: 1 }}
       style={{
-        width: 250,
+        width: 252,
         borderRadius: 24,
         padding: 18,
         marginRight: 14,
@@ -229,14 +295,16 @@ function GroupCard({ item }: { item: InterestGroup }) {
       <View className="absolute right-[-8] top-[-8] h-24 w-24 rounded-full bg-white/10" />
 
       <View className="flex-row items-center justify-between">
-        <View className="h-11 w-11 items-center justify-center rounded-2xl bg-white/15">
-          <Icon size={20} color="#FFFFFF" strokeWidth={2.4} />
+        <View className="h-12 w-12 overflow-hidden rounded-2xl border border-white/15 bg-white/10">
+          <Image
+            source={{ uri: item.logo }}
+            resizeMode="cover"
+            className="h-full w-full"
+          />
         </View>
 
-        <View className="rounded-full bg-white/15 px-3 py-1">
-          <Text className="text-[11px] font-bold uppercase tracking-[1px] text-white">
-            Group
-          </Text>
+        <View className="h-10 w-10 items-center justify-center rounded-2xl bg-white/15">
+          <Icon size={18} color="#FFFFFF" strokeWidth={2.4} />
         </View>
       </View>
 
@@ -250,7 +318,10 @@ function GroupCard({ item }: { item: InterestGroup }) {
         {item.members}
       </Text>
 
-      <Pressable className="mt-5 self-start rounded-[14px] bg-white px-4 py-3">
+      <Pressable
+        onPress={onJoin}
+        className="mt-5 self-start rounded-[14px] bg-white px-4 py-3"
+      >
         <Text className="text-[14px] font-extrabold text-[#0F172A]">Join</Text>
       </Pressable>
     </LinearGradient>
@@ -278,7 +349,7 @@ function OpportunityCard({
       className="mb-4 rounded-[24px] border border-white/8 bg-[#0F1727] px-4 py-4"
     >
       <View className="flex-row items-start">
-        <CompanyMark company={item.company} type={item.type} />
+        <CompanyLogo company={item.company} type={item.type} />
 
         <View className="ml-4 flex-1">
           <View className="flex-row items-start justify-between">
@@ -403,8 +474,8 @@ function DetailSheet({
             contentContainerStyle={{ paddingBottom: 32 }}
           >
             <View className="flex-row items-start justify-between">
-              <View className="flex-row items-start flex-1 pr-4">
-                <CompanyMark company={item.company} type={item.type} />
+              <View className="flex-row flex-1 items-start pr-4">
+                <CompanyLogo company={item.company} type={item.type} />
                 <View className="ml-4 flex-1">
                   <View
                     className="self-start rounded-full px-3 py-1"
@@ -492,7 +563,7 @@ function DetailSheet({
                   "Can improve your CV and readiness score after completion.",
                 ].map((reason) => (
                   <View key={reason} className="mb-3 flex-row items-start">
-                    <View className="mt-1 mr-3 h-2.5 w-2.5 rounded-full bg-[#3B82F6]" />
+                    <View className="mr-3 mt-1 h-2.5 w-2.5 rounded-full bg-[#3B82F6]" />
                     <Text className="flex-1 text-[14px] leading-7 text-[#A8B3C7]">
                       {reason}
                     </Text>
@@ -551,6 +622,105 @@ function DetailSheet({
   );
 }
 
+function GroupsSheet({
+  visible,
+  onClose,
+  groups,
+}: {
+  visible: boolean;
+  onClose: () => void;
+  groups: InterestGroup[];
+}) {
+  return (
+    <Modal
+      visible={visible}
+      animationType="slide"
+      transparent
+      onRequestClose={onClose}
+    >
+      <View className="flex-1 justify-end bg-black/55">
+        <Pressable className="flex-1" onPress={onClose} />
+
+        <View className="max-h-[78%] rounded-t-[32px] border border-white/10 bg-[#0A1220] px-5 pt-3">
+          <View className="mb-4 items-center">
+            <View className="h-1.5 w-14 rounded-full bg-white/15" />
+          </View>
+
+          <View className="mb-4 flex-row items-center justify-between">
+            <View>
+              <Text className="text-[22px] font-extrabold text-white">
+                All groups
+              </Text>
+              <Text className="mt-1 text-[14px] text-[#94A3B8]">
+                Communities you may want to join
+              </Text>
+            </View>
+
+            <Pressable
+              onPress={onClose}
+              className="h-11 w-11 items-center justify-center rounded-2xl border border-white/10 bg-white/5"
+            >
+              <X size={18} color="#E2E8F0" strokeWidth={2.4} />
+            </Pressable>
+          </View>
+
+          <ScrollView
+            showsVerticalScrollIndicator={false}
+            contentContainerStyle={{ paddingBottom: 30 }}
+          >
+            {groups.map((group) => {
+              const Icon = group.icon;
+
+              return (
+                <View
+                  key={group.id}
+                  className="mb-4 rounded-[24px] border border-white/8 bg-[#0F1727] px-4 py-4"
+                >
+                  <View className="flex-row items-start">
+                    <View className="h-14 w-14 overflow-hidden rounded-[18px] border border-white/10">
+                      <Image
+                        source={{ uri: group.logo }}
+                        className="h-full w-full"
+                        resizeMode="cover"
+                      />
+                    </View>
+
+                    <View className="ml-4 flex-1">
+                      <View className="flex-row items-start justify-between">
+                        <View className="flex-1 pr-3">
+                          <Text className="text-[17px] font-extrabold text-white">
+                            {group.name}
+                          </Text>
+                          <Text className="mt-1 text-[14px] leading-6 text-[#94A3B8]">
+                            {group.subtitle}
+                          </Text>
+                          <Text className="mt-2 text-[13px] font-semibold text-[#CBD5E1]">
+                            {group.members}
+                          </Text>
+                        </View>
+
+                        <View className="h-10 w-10 items-center justify-center rounded-2xl bg-white/5">
+                          <Icon size={18} color="#93C5FD" strokeWidth={2.4} />
+                        </View>
+                      </View>
+
+                      <Pressable className="mt-4 self-start rounded-[14px] bg-[#2563EB] px-4 py-3">
+                        <Text className="text-[14px] font-extrabold text-white">
+                          Join group
+                        </Text>
+                      </Pressable>
+                    </View>
+                  </View>
+                </View>
+              );
+            })}
+          </ScrollView>
+        </View>
+      </View>
+    </Modal>
+  );
+}
+
 export default function OpportunitiesScreen() {
   const { opportunities, savedIds, appliedIds, toggleSaveOpportunity } =
     useLaunchpad();
@@ -561,6 +731,7 @@ export default function OpportunitiesScreen() {
   const [selectedItem, setSelectedItem] = useState<OpportunityLite | null>(
     null,
   );
+  const [groupsVisible, setGroupsVisible] = useState(false);
 
   const filteredItems = useMemo(() => {
     return (opportunities as OpportunityLite[]).filter((item) => {
@@ -583,7 +754,6 @@ export default function OpportunitiesScreen() {
         <View className="absolute right-[-20] top-80 h-40 w-40 rounded-full bg-[#7C3AED]/8" />
 
         <View className="px-5 pt-3">
-          {/* Search starts at top */}
           <View className="mb-5 flex-row items-center">
             <View className="mr-3 flex-1 flex-row items-center rounded-[22px] border border-white/10 bg-white/5 px-4">
               <Search size={18} color="#94A3B8" strokeWidth={2.4} />
@@ -631,41 +801,32 @@ export default function OpportunitiesScreen() {
             </Pressable>
           </View>
 
-          {/* Groups section */}
-          <View className="mb-4 flex-row items-end justify-between">
-            <View className="flex-1 pr-4">
-              <Text className="text-[20px] font-extrabold tracking-tight text-white">
-                Groups you may like
-              </Text>
-              <Text className="mt-1 text-[14px] leading-6 text-[#8A94A7]">
-                Join communities around careers, scholarships, and research.
-              </Text>
-            </View>
-
-            <View className="h-11 w-11 items-center justify-center rounded-2xl border border-white/10 bg-white/5">
-              <Users size={18} color="#93C5FD" strokeWidth={2.4} />
-            </View>
-          </View>
+          <SectionTitleRow
+            title="Groups you may like"
+            subtitle="Join communities around careers, scholarships, and research."
+            actionLabel="View all"
+            onActionPress={() => setGroupsVisible(true)}
+          />
 
           <ScrollView
             horizontal
             showsHorizontalScrollIndicator={false}
             className="mb-8"
           >
-            {interestGroups.map((group) => (
+            {interestGroups.slice(0, 3).map((group) => (
               <GroupCard key={group.id} item={group} />
             ))}
           </ScrollView>
 
-          {/* Results */}
-          <View className="mb-4">
-            <Text className="text-[20px] font-extrabold tracking-tight text-white">
-              Matches for you
-            </Text>
-            <Text className="mt-1 text-[14px] leading-6 text-[#8A94A7]">
-              Ranked opportunities aligned to your profile and current path.
-            </Text>
-          </View>
+          <SectionTitleRow
+            title="Matches for you"
+            subtitle="Ranked opportunities aligned to your profile and current path."
+            actionLabel="See all"
+            onActionPress={() => {
+              setQuery("");
+              setActiveFilter("All");
+            }}
+          />
 
           {filteredItems.length === 0 ? (
             <View className="rounded-[28px] border border-white/8 bg-[#0F1727] px-5 py-8">
@@ -704,6 +865,12 @@ export default function OpportunitiesScreen() {
         onToggleSave={() => {
           if (selectedItem) toggleSaveOpportunity(selectedItem.id);
         }}
+      />
+
+      <GroupsSheet
+        visible={groupsVisible}
+        onClose={() => setGroupsVisible(false)}
+        groups={interestGroups}
       />
     </SafeAreaView>
   );
