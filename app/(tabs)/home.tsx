@@ -7,9 +7,11 @@ import {
   Bell,
   Brain,
   BriefcaseBusiness,
+  ChevronRight,
   CircleCheckBig,
   FileText,
   GraduationCap,
+  MessageSquare,
   Microscope,
   RefreshCw,
   Search,
@@ -17,7 +19,7 @@ import {
   Target,
   TrendingUp,
   UserPlus,
-  Users
+  Users,
 } from "lucide-react-native";
 import React from "react";
 import { Image, Pressable, ScrollView, Text, View } from "react-native";
@@ -29,8 +31,10 @@ type MatchCardType = {
   id: string;
   type: "Internship" | "Scholarship" | "Research" | "Volunteer";
   title: string;
+  organization: string;
   subtitle: string;
   meta: string;
+  logo: string;
   colors: [string, string, ...string[]];
   icon: LucideIcon;
   cta: string;
@@ -52,8 +56,10 @@ const matchCards: MatchCardType[] = [
     id: "1",
     type: "Internship",
     title: "UX Research Intern",
-    subtitle: "Google • Summer 2024",
+    organization: "Google",
+    subtitle: "Summer 2024 • Remote-friendly",
     meta: "98% profile fit",
+    logo: "https://logo.clearbit.com/google.com",
     colors: ["#2563EB", "#1D4ED8", "#1E3A8A"],
     icon: BriefcaseBusiness,
     cta: "Apply",
@@ -63,8 +69,10 @@ const matchCards: MatchCardType[] = [
     id: "2",
     type: "Scholarship",
     title: "Exchange Mobility Grant",
-    subtitle: "EU partner schools",
+    organization: "EU Partner Schools",
+    subtitle: "Semester abroad • Funded support",
     meta: "Deadline in 8 days",
+    logo: "https://images.unsplash.com/photo-1523050854058-8df90110c9f1?q=80&w=200&auto=format&fit=crop",
     colors: ["#7C3AED", "#6D28D9", "#4C1D95"],
     icon: GraduationCap,
     cta: "Review",
@@ -74,8 +82,10 @@ const matchCards: MatchCardType[] = [
     id: "3",
     type: "Research",
     title: "HCI Research Assistant",
-    subtitle: "Design Lab • Semester role",
+    organization: "Design Lab",
+    subtitle: "Semester role • Research credit possible",
     meta: "Recommended by lecturers",
+    logo: "https://images.unsplash.com/photo-1532187643603-ba119ca4109e?q=80&w=200&auto=format&fit=crop",
     colors: ["#0F766E", "#0D9488", "#115E59"],
     icon: Microscope,
     cta: "View",
@@ -140,6 +150,11 @@ const peers = [
   },
 ];
 
+function getSchoolBadge(school: string) {
+  const encoded = encodeURIComponent(school);
+  return `https://ui-avatars.com/api/?name=${encoded}&background=0F235B&color=FFFFFF&size=96&bold=true`;
+}
+
 function AvatarBubble({ name, uri }: { name: string; uri?: string | null }) {
   const initials = name
     ?.split(" ")
@@ -162,6 +177,31 @@ function AvatarBubble({ name, uri }: { name: string; uri?: string | null }) {
     <View className="h-11 w-11 items-center justify-center rounded-full border border-white/15 bg-[#111827]">
       <Text className="text-sm font-bold text-white">{initials || "A"}</Text>
     </View>
+  );
+}
+
+function ActionIconButton({
+  icon: Icon,
+  onPress,
+  badge,
+}: {
+  icon: LucideIcon;
+  onPress: () => void;
+  badge?: number;
+}) {
+  return (
+    <Pressable onPress={onPress} className="mr-3">
+      <View className="h-11 w-11 items-center justify-center rounded-2xl border border-white/10 bg-white/5">
+        <Icon size={19} color="#E2E8F0" strokeWidth={2.2} />
+        {badge ? (
+          <View className="absolute right-2.5 top-2.5 h-4.5 min-w-[18px] items-center justify-center rounded-full bg-[#2563EB] px-1">
+            <Text className="text-[10px] font-extrabold text-white">
+              {badge > 9 ? "9+" : badge}
+            </Text>
+          </View>
+        ) : null}
+      </View>
+    </Pressable>
   );
 }
 
@@ -252,31 +292,44 @@ function MatchCard({ item }: { item: MatchCardType }) {
       colors={item.colors}
       start={{ x: 0, y: 0 }}
       end={{ x: 1, y: 1 }}
-      style={{ width: 290, borderRadius: 28, padding: 20, marginRight: 16 }}
+      style={{ width: 302, borderRadius: 28, padding: 20, marginRight: 16 }}
     >
       <View className="absolute right-[-8] top-[-12] h-28 w-28 rounded-full bg-white/10" />
-      <View className="self-start rounded-full bg-white/15 px-3 py-1.5">
-        <Text className="text-[11px] font-extrabold uppercase tracking-[1.5px] text-white">
-          {item.type}
-        </Text>
-      </View>
 
-      <View className="mt-5 flex-row items-start justify-between">
-        <View className="flex-1 pr-3">
-          <Text className="text-[22px] font-extrabold leading-7 text-white">
-            {item.title}
-          </Text>
-          <Text className="mt-2 text-[15px] text-white/90">
-            {item.subtitle}
-          </Text>
-          <Text className="mt-2 text-[13px] font-semibold text-white/75">
-            {item.meta}
+      <View className="flex-row items-center justify-between">
+        <View className="self-start rounded-full bg-white/15 px-3 py-1.5">
+          <Text className="text-[11px] font-extrabold uppercase tracking-[1.5px] text-white">
+            {item.type}
           </Text>
         </View>
 
         <View className="h-11 w-11 items-center justify-center rounded-2xl bg-white/12">
           <Icon size={20} color="#FFFFFF" strokeWidth={2.3} />
         </View>
+      </View>
+
+      <Text className="mt-5 text-[22px] font-extrabold leading-7 text-white">
+        {item.title}
+      </Text>
+
+      <View className="mt-4 flex-row items-center">
+        <Image
+          source={{ uri: item.logo }}
+          resizeMode="cover"
+          className="h-11 w-11 rounded-2xl border border-white/15 bg-white/10"
+        />
+        <View className="ml-3 flex-1">
+          <Text className="text-[15px] font-bold text-white">
+            {item.organization}
+          </Text>
+          <Text className="mt-0.5 text-[13px] text-white/85">
+            {item.subtitle}
+          </Text>
+        </View>
+      </View>
+
+      <View className="mt-4 self-start rounded-full bg-white/15 px-3 py-1.5">
+        <Text className="text-[12px] font-bold text-white">{item.meta}</Text>
       </View>
 
       <Pressable
@@ -341,7 +394,6 @@ export default function HomeScreen() {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingBottom: 160 }}
       >
-        {/* Background glows */}
         <View className="absolute left-[-50] top-[-20] h-56 w-56 rounded-full bg-[#2563EB]/20" />
         <View className="absolute right-[-30] top-24 h-48 w-48 rounded-full bg-[#7C3AED]/10" />
         <View className="absolute left-20 top-[520] h-40 w-40 rounded-full bg-[#0EA5E9]/8" />
@@ -370,15 +422,17 @@ export default function HomeScreen() {
             </View>
 
             <View className="flex-row items-center">
-              <Pressable
+              <ActionIconButton
+                icon={MessageSquare}
+                onPress={() => router.push("/messages" as never)}
+                badge={3}
+              />
+
+              <ActionIconButton
+                icon={Bell}
                 onPress={() => router.push("/notifications")}
-                className="mr-3"
-              >
-                <View className="h-11 w-11 items-center justify-center rounded-2xl border border-white/10 bg-white/5">
-                  <Bell size={19} color="#E2E8F0" strokeWidth={2.2} />
-                  <View className="absolute right-3 top-3 h-2.5 w-2.5 rounded-full bg-[#FB7185]" />
-                </View>
-              </Pressable>
+                badge={2}
+              />
 
               <AvatarBubble
                 name={profile?.name || "Alex Doe"}
@@ -629,6 +683,22 @@ export default function HomeScreen() {
           <SectionHeader
             title="People on your path"
             subtitle="Students in other universities doing the same course."
+            action={
+              <Pressable
+                onPress={() => router.push("/(tabs)/profile")}
+                className="flex-row items-center"
+              >
+                <Text className="text-[13px] font-extrabold uppercase tracking-[1px] text-[#60A5FA]">
+                  View all
+                </Text>
+                <ChevronRight
+                  size={15}
+                  color="#60A5FA"
+                  strokeWidth={2.6}
+                  style={{ marginLeft: 4 }}
+                />
+              </Pressable>
+            }
           />
 
           <GlassCard className="mb-8 px-5 py-5">
@@ -663,10 +733,22 @@ export default function HomeScreen() {
                     source={{ uri: peer.avatar }}
                     className="mr-3 h-11 w-11 rounded-full"
                   />
+
                   <View className="flex-1">
-                    <Text className="text-[15px] font-bold text-white">
-                      {peer.name}
-                    </Text>
+                    <View className="flex-row items-center">
+                      <Text className="text-[15px] font-bold text-white">
+                        {peer.name}
+                      </Text>
+
+                      <View className="ml-2 h-6 w-6 overflow-hidden rounded-full border border-white/10">
+                        <Image
+                          source={{ uri: getSchoolBadge(peer.school) }}
+                          resizeMode="cover"
+                          className="h-full w-full"
+                        />
+                      </View>
+                    </View>
+
                     <Text className="mt-0.5 text-[13px] text-[#94A3B8]">
                       {peer.school} • {peer.course}
                     </Text>
