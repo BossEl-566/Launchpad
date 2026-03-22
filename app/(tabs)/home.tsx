@@ -3,17 +3,14 @@ import { router } from "expo-router";
 import type { LucideIcon } from "lucide-react-native";
 import {
   ArrowRight,
-  BadgeCheck,
   Bell,
-  Brain,
   BriefcaseBusiness,
   ChevronRight,
-  CircleCheckBig,
   FileText,
   GraduationCap,
+  Menu,
   MessageSquare,
   Microscope,
-  RefreshCw,
   Search,
   Sparkles,
   Target,
@@ -21,191 +18,549 @@ import {
   UserPlus,
   Users,
 } from "lucide-react-native";
-import React from "react";
-import { Image, Pressable, ScrollView, Text, View } from "react-native";
+import React, { useMemo, useState } from "react";
+import {
+  Image,
+  Platform,
+  Pressable,
+  ScrollView,
+  StatusBar,
+  Text,
+  View,
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { useLaunchpad } from "../../src/context/LaunchpadContext";
 
-type MatchCardType = {
+const FONT = Platform.select({
+  android: "Roboto",
+  ios: "System",
+  default: "System",
+});
+
+type QuickAction = {
   id: string;
-  type: "Internship" | "Scholarship" | "Research" | "Volunteer";
-  title: string;
-  organization: string;
-  subtitle: string;
-  meta: string;
-  logo: string;
-  colors: [string, string, ...string[]];
+  label: string;
   icon: LucideIcon;
-  cta: string;
   route: string;
+  border: string;
+  text: string;
+  bg: string;
 };
 
-type FeedItemType = {
+type OpportunityCardType = {
+  id: string;
+  title: string;
+  org: string;
+  meta: string;
+  description: string;
+  route: string;
+  colors: [string, string, ...string[]];
+  icon: LucideIcon;
+  action: string;
+};
+
+type PeerType = {
+  id: string;
+  name: string;
+  school: string;
+  course: string;
+  avatar: string;
+};
+
+type FeedType = {
   id: string;
   title: string;
   subtitle: string;
-  time: string;
   icon: LucideIcon;
   iconBg: string;
   iconColor: string;
 };
 
-const matchCards: MatchCardType[] = [
+const quickActions: QuickAction[] = [
   {
     id: "1",
-    type: "Internship",
-    title: "UX Research Intern",
-    organization: "Google",
-    subtitle: "Summer 2024 • Remote-friendly",
-    meta: "98% profile fit",
-    logo: "https://logo.clearbit.com/google.com",
-    colors: ["#2563EB", "#1D4ED8", "#1E3A8A"],
-    icon: BriefcaseBusiness,
-    cta: "Apply",
-    route: "/(tabs)/opportunities",
+    label: "CV",
+    icon: FileText,
+    route: "/(tabs)/cv",
+    border: "#59631E",
+    text: "#D8E56A",
+    bg: "#12170E",
   },
   {
     id: "2",
-    type: "Scholarship",
-    title: "Exchange Mobility Grant",
-    organization: "EU Partner Schools",
-    subtitle: "Semester abroad • Funded support",
-    meta: "Deadline in 8 days",
-    logo: "https://images.unsplash.com/photo-1523050854058-8df90110c9f1?q=80&w=200&auto=format&fit=crop",
-    colors: ["#7C3AED", "#6D28D9", "#4C1D95"],
-    icon: GraduationCap,
-    cta: "Review",
+    label: "Matches",
+    icon: BriefcaseBusiness,
     route: "/(tabs)/opportunities",
+    border: "#0F6E79",
+    text: "#57E6F7",
+    bg: "#0B151A",
   },
   {
     id: "3",
-    type: "Research",
-    title: "HCI Research Assistant",
-    organization: "Design Lab",
-    subtitle: "Semester role • Research credit possible",
-    meta: "Recommended by lecturers",
-    logo: "https://images.unsplash.com/photo-1532187643603-ba119ca4109e?q=80&w=200&auto=format&fit=crop",
-    colors: ["#0F766E", "#0D9488", "#115E59"],
+    label: "Research",
     icon: Microscope,
-    cta: "View",
     route: "/(tabs)/opportunities",
+    border: "#7A4C1F",
+    text: "#F9B76B",
+    bg: "#17110C",
+  },
+  {
+    id: "4",
+    label: "Network",
+    icon: Users,
+    route: "/(tabs)/profile",
+    border: "#2D6D3B",
+    text: "#7CE4A1",
+    bg: "#0D1712",
+  },
+  {
+    id: "5",
+    label: "Skills",
+    icon: Sparkles,
+    route: "/(tabs)/roadmap",
+    border: "#4E4599",
+    text: "#AFA4FF",
+    bg: "#141322",
   },
 ];
 
-const activityFeed: FeedItemType[] = [
+const opportunities: OpportunityCardType[] = [
   {
     id: "1",
-    title: "Volunteer work verified",
-    subtitle: "Community Tech Center confirmed your 20 hours.",
-    time: "2 HOURS AGO",
-    icon: BadgeCheck,
-    iconBg: "#102A63",
-    iconColor: "#60A5FA",
+    title: "Frontend Internship Match",
+    org: "Launchpad AI",
+    meta: "94% fit score",
+    description:
+      "A role matched to your course history, verified skills, and current interests.",
+    route: "/(tabs)/opportunities",
+    colors: ["#2D6BFF", "#2B59F3", "#EAF2FF"],
+    icon: BriefcaseBusiness,
+    action: "See match",
   },
   {
     id: "2",
-    title: "New course-mate connection",
-    subtitle: "Sarah from City Uni (CS) started following you.",
-    time: "YESTERDAY",
-    icon: UserPlus,
-    iconBg: "#31124E",
-    iconColor: "#C084FC",
+    title: "Research Assistant Opening",
+    org: "Digital Systems Lab",
+    meta: "Recommended by profile",
+    description:
+      "Your academic direction suggests strong alignment with this research path.",
+    route: "/(tabs)/opportunities",
+    colors: ["#124DFF", "#366DFF", "#DCE9FF"],
+    icon: Microscope,
+    action: "View role",
+  },
+  {
+    id: "3",
+    title: "Scholarship Opportunity",
+    org: "Global Student Mobility",
+    meta: "Deadline in 6 days",
+    description:
+      "A scholarship path selected from your progress, extracurriculars, and goals.",
+    route: "/(tabs)/opportunities",
+    colors: ["#275CFF", "#3A73FF", "#E9F2FF"],
+    icon: GraduationCap,
+    action: "Review now",
   },
 ];
 
-const skills = [
-  "Product Design",
-  "Python",
-  "Data Viz",
-  "Academic Writing",
-  "Research Methods",
-  "Public Speaking",
-];
-
-const peers = [
+const peers: PeerType[] = [
   {
     id: "1",
-    name: "Sarah",
-    school: "City Uni",
+    name: "Sarah Mensah",
+    school: "KNUST",
     course: "Computer Science",
     avatar:
       "https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=200&auto=format&fit=crop",
   },
   {
     id: "2",
-    name: "David",
-    school: "KNUST",
+    name: "Daniel Asare",
+    school: "UCC",
     course: "Computer Science",
     avatar:
       "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=200&auto=format&fit=crop",
   },
   {
     id: "3",
-    name: "Ama",
-    school: "UCC",
-    course: "Computer Science",
+    name: "Ama Owusu",
+    school: "UG",
+    course: "Information Technology",
     avatar:
       "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?q=80&w=200&auto=format&fit=crop",
   },
 ];
 
-function getSchoolBadge(school: string) {
-  const encoded = encodeURIComponent(school);
-  return `https://ui-avatars.com/api/?name=${encoded}&background=0F235B&color=FFFFFF&size=96&bold=true`;
+const activityFeed: FeedType[] = [
+  {
+    id: "1",
+    title: "Volunteer experience verified",
+    subtitle:
+      "Your recent activity can now be added to your CV for stronger profile visibility.",
+    icon: Sparkles,
+    iconBg: "#12233D",
+    iconColor: "#6EB4FF",
+  },
+  {
+    id: "2",
+    title: "New connection request",
+    subtitle:
+      "A student following a similar academic path wants to connect with you.",
+    icon: UserPlus,
+    iconBg: "#1E1839",
+    iconColor: "#B79AFF",
+  },
+  {
+    id: "3",
+    title: "Fresh opportunity match",
+    subtitle:
+      "A new internship recommendation has been generated from your latest progress.",
+    icon: BriefcaseBusiness,
+    iconBg: "#182A24",
+    iconColor: "#7BE0A1",
+  },
+];
+
+function fontStyle(weight: "400" | "500" | "700" | "900" = "400") {
+  return {
+    fontFamily: FONT,
+    fontWeight: weight,
+  } as const;
 }
 
-function AvatarBubble({ name, uri }: { name: string; uri?: string | null }) {
-  const initials = name
-    ?.split(" ")
-    .slice(0, 2)
-    .map((part) => part[0])
-    .join("")
-    .toUpperCase();
+function Avatar({
+  name,
+  uri,
+  size = 44,
+}: {
+  name: string;
+  uri?: string | null;
+  size?: number;
+}) {
+  const initials = useMemo(() => {
+    const parts = name?.trim().split(" ").filter(Boolean) || [];
+    const joined = parts
+      .slice(0, 2)
+      .map((part) => part[0])
+      .join("")
+      .toUpperCase();
+
+    return joined || "L";
+  }, [name]);
 
   if (uri) {
     return (
       <Image
         source={{ uri }}
         resizeMode="cover"
-        className="h-11 w-11 rounded-full border border-white/15"
+        style={{ width: size, height: size, borderRadius: size / 2 }}
+        className="border border-white/15"
       />
     );
   }
 
   return (
-    <View className="h-11 w-11 items-center justify-center rounded-full border border-white/15 bg-[#111827]">
-      <Text className="text-sm font-bold text-white">{initials || "A"}</Text>
+    <LinearGradient
+      colors={["#4D95FF", "#2D6BFF", "#244CF0"]}
+      style={{ width: size, height: size, borderRadius: size / 2 }}
+      className="items-center justify-center border border-white/15"
+    >
+      <Text style={[fontStyle("700")]} className="text-white">
+        {initials}
+      </Text>
+    </LinearGradient>
+  );
+}
+
+function StaticHeader({
+  onMenuPress,
+  onProfilePress,
+  profileName,
+  profileAvatar,
+}: {
+  onMenuPress: () => void;
+  onProfilePress: () => void;
+  profileName: string;
+  profileAvatar?: string | null;
+}) {
+  return (
+    <View className="absolute left-0 right-0 top-0 z-40">
+      <SafeAreaView edges={["top"]}>
+        <View className="px-5 pb-3 pt-2">
+          <View className="flex-row items-center justify-between">
+            <Pressable
+              onPress={onMenuPress}
+              className="h-12 w-12 items-center justify-center rounded-full border border-white/10 bg-[#0E162B]/90"
+              style={{
+                shadowColor: "#3B82F6",
+                shadowOpacity: 0.14,
+                shadowRadius: 18,
+                shadowOffset: { width: 0, height: 8 },
+                elevation: 5,
+              }}
+            >
+              <Menu size={20} color="#EAF2FF" strokeWidth={2.3} />
+            </Pressable>
+
+            <Pressable onPress={onProfilePress}>
+              <Avatar name={profileName} uri={profileAvatar} size={46} />
+            </Pressable>
+          </View>
+        </View>
+      </SafeAreaView>
     </View>
   );
 }
 
-function ActionIconButton({
-  icon: Icon,
-  onPress,
-  badge,
+function MenuPopover({
+  visible,
+  onClose,
 }: {
-  icon: LucideIcon;
-  onPress: () => void;
-  badge?: number;
+  visible: boolean;
+  onClose: () => void;
 }) {
+  if (!visible) return null;
+
   return (
-    <Pressable onPress={onPress} className="mr-3">
-      <View className="h-11 w-11 items-center justify-center rounded-2xl border border-white/10 bg-white/5">
-        <Icon size={19} color="#E2E8F0" strokeWidth={2.2} />
-        {badge ? (
-          <View className="absolute right-2.5 top-2.5 h-4.5 min-w-[18px] items-center justify-center rounded-full bg-[#2563EB] px-1">
-            <Text className="text-[10px] font-extrabold text-white">
-              {badge > 9 ? "9+" : badge}
+    <View className="absolute inset-0 z-50">
+      <Pressable onPress={onClose} className="absolute inset-0 bg-black/20" />
+
+      <View className="absolute left-5 top-[86px] w-[220px] overflow-hidden rounded-[28px] border border-white/10 bg-[#0C1427] px-3 py-3">
+        <View className="absolute right-[-18] top-[-18] h-24 w-24 rounded-full bg-[#2B63FF]/20" />
+        <View className="absolute left-[-10] bottom-[-16] h-20 w-20 rounded-full bg-[#47A3FF]/10" />
+
+        <Pressable
+          onPress={() => {
+            onClose();
+            router.push("/messages" as never);
+          }}
+          className="mb-2 flex-row items-center rounded-[20px] border border-white/6 bg-white/5 px-3 py-3"
+        >
+          <View className="mr-3 h-11 w-11 items-center justify-center rounded-full bg-[#142542]">
+            <MessageSquare size={18} color="#84B9FF" strokeWidth={2.3} />
+          </View>
+
+          <View className="flex-1">
+            <Text style={[fontStyle("700")]} className="text-[15px] text-white">
+              Messages
+            </Text>
+            <Text
+              style={[fontStyle("400")]}
+              className="mt-0.5 text-[12px] text-[#97A7C2]"
+            >
+              Open student chats
             </Text>
           </View>
-        ) : null}
+
+          <ChevronRight size={16} color="#8EA4C8" strokeWidth={2.5} />
+        </Pressable>
+
+        <Pressable
+          onPress={() => {
+            onClose();
+            router.push("/notifications" as never);
+          }}
+          className="flex-row items-center rounded-[20px] border border-white/6 bg-white/5 px-3 py-3"
+        >
+          <View className="mr-3 h-11 w-11 items-center justify-center rounded-full bg-[#142542]">
+            <Bell size={18} color="#84B9FF" strokeWidth={2.3} />
+          </View>
+
+          <View className="flex-1">
+            <Text style={[fontStyle("700")]} className="text-[15px] text-white">
+              Notifications
+            </Text>
+            <Text
+              style={[fontStyle("400")]}
+              className="mt-0.5 text-[12px] text-[#97A7C2]"
+            >
+              See recent updates
+            </Text>
+          </View>
+
+          <ChevronRight size={16} color="#8EA4C8" strokeWidth={2.5} />
+        </Pressable>
       </View>
+    </View>
+  );
+}
+
+function HeroOrb() {
+  return (
+    <View
+      className="relative h-[148px] w-[148px] items-center justify-center"
+      style={{ transform: [{ rotate: "14deg" }] }}
+    >
+      <LinearGradient
+        colors={["#DDF2FF", "#61B5FF", "#1E65FF", "#1347D8"]}
+        start={{ x: 0.1, y: 0.1 }}
+        end={{ x: 1, y: 1 }}
+        className="absolute inset-0 rounded-[42px]"
+      />
+      <View className="absolute left-[14px] top-[16px] h-[54px] w-[54px] rounded-[22px] bg-white/35" />
+      <View className="absolute right-[12px] top-[12px] h-[46px] w-[46px] rounded-[18px] bg-white/25" />
+      <View className="absolute bottom-[18px] left-[22px] h-[42px] w-[68px] rounded-[22px] bg-[#0B2D9A]/45" />
+      <View className="absolute right-[18px] bottom-[22px] h-[70px] w-[32px] rounded-[20px] bg-white/18" />
+      <View className="absolute left-[42px] top-[38px] h-[74px] w-[28px] rounded-[16px] bg-[#0B42D9]/35" />
+    </View>
+  );
+}
+
+function HeroCard() {
+  return (
+    <LinearGradient
+      colors={["#2A63F8", "#4D89FF", "#F3F7FF"]}
+      start={{ x: 0.05, y: 0.05 }}
+      end={{ x: 0.95, y: 0.95 }}
+      className="overflow-hidden rounded-[28px] px-5 py-5"
+      style={{
+        minHeight: 175,
+        shadowColor: "#2C5CFF",
+        shadowOpacity: 0.22,
+        shadowRadius: 24,
+        shadowOffset: { width: 0, height: 12 },
+        elevation: 10,
+      }}
+    >
+      {/* soft glow spots */}
+      <View className="absolute left-[-18] bottom-[-24] h-24 w-24 rounded-full bg-white/12" />
+      <View className="absolute right-[-10] top-[-10] h-24 w-24 rounded-full bg-white/10" />
+      <View className="absolute bottom-0 left-0 right-0 h-16 bg-white/10" />
+
+      <View className="flex-row items-center justify-between">
+        {/* left content */}
+        <View className="flex-1 pr-3">
+          <Text
+            style={{
+              fontFamily: "Roboto_700Bold",
+              fontSize: 20,
+              color: "#FFFFFF",
+            }}
+          >
+            Career Match Hub
+          </Text>
+
+          <Text
+            style={{
+              fontFamily: "Roboto_400Regular",
+              fontSize: 14,
+              lineHeight: 22,
+              color: "#EAF1FF",
+              marginTop: 8,
+              maxWidth: 210,
+            }}
+          >
+            Discover internships, scholarships and research opportunities
+            tailored to your journey.
+          </Text>
+
+          <Pressable
+            onPress={() => router.push("/(tabs)/opportunities" as never)}
+            className="mt-5 self-start overflow-hidden rounded-full"
+            style={{
+              shadowColor: "#334DFF",
+              shadowOpacity: 0.26,
+              shadowRadius: 18,
+              shadowOffset: { width: 0, height: 8 },
+              elevation: 8,
+            }}
+          >
+            <LinearGradient
+              colors={["#3457FF", "#5C63FF", "#2C3EF2"]}
+              start={{ x: 0, y: 0.2 }}
+              end={{ x: 1, y: 0.8 }}
+              style={{
+                borderRadius: 999,
+                paddingHorizontal: 24,
+                paddingVertical: 14,
+              }}
+            >
+              <Text
+                style={{
+                  fontFamily: "Roboto_700Bold",
+                  fontSize: 15,
+                  color: "#FFFFFF",
+                }}
+              >
+                Explore Now
+              </Text>
+            </LinearGradient>
+          </Pressable>
+        </View>
+
+        {/* right artwork */}
+        <View className="items-center justify-center">
+          <Image
+            source={require("../../assets/images/hero-blue-shape.png")}
+            resizeMode="contain"
+            style={{
+              width: 145,
+              height: 145,
+              marginRight: -6,
+            }}
+          />
+        </View>
+      </View>
+    </LinearGradient>
+  );
+}
+
+function QuickActionPill({ item }: { item: QuickAction }) {
+  const Icon = item.icon;
+
+  return (
+    <Pressable
+      onPress={() => router.push(item.route as never)}
+      className="mr-3 flex-row items-center rounded-full px-4 py-3"
+      style={{
+        backgroundColor: item.bg,
+        borderWidth: 1,
+        borderColor: item.border,
+      }}
+    >
+      <Icon size={16} color={item.text} strokeWidth={2.3} />
+      <Text
+        style={[fontStyle("500")]}
+        className="ml-2 text-[15px]"
+        // @ts-ignore
+        textBreakStrategy="simple"
+      >
+        <Text style={{ color: item.text }}>{item.label}</Text>
+      </Text>
     </Pressable>
   );
 }
 
-function GlassCard({
+function SectionTitle({
+  title,
+  actionLabel,
+  onPress,
+}: {
+  title: string;
+  actionLabel?: string;
+  onPress?: () => void;
+}) {
+  return (
+    <View className="mb-4 flex-row items-center justify-between">
+      <Text style={[fontStyle("700")]} className="text-[18px] text-white">
+        {title}
+      </Text>
+
+      {actionLabel ? (
+        <Pressable onPress={onPress}>
+          <Text
+            style={[fontStyle("500")]}
+            className="text-[15px] text-[#D7DFEC]"
+          >
+            {actionLabel}
+          </Text>
+        </Pressable>
+      ) : null}
+    </View>
+  );
+}
+
+function GlassPanel({
   children,
   className = "",
 }: {
@@ -214,13 +569,13 @@ function GlassCard({
 }) {
   return (
     <View
-      className={`overflow-hidden rounded-[28px] border border-white/10 bg-[#0D1424] ${className}`}
+      className={`overflow-hidden rounded-[24px] border border-white/8 bg-[#0E1627]/95 ${className}`}
       style={{
-        shadowColor: "#2563EB",
+        shadowColor: "#1C55FF",
         shadowOpacity: 0.08,
         shadowRadius: 16,
-        shadowOffset: { width: 0, height: 0 },
-        elevation: 3,
+        shadowOffset: { width: 0, height: 10 },
+        elevation: 4,
       }}
     >
       {children}
@@ -228,63 +583,41 @@ function GlassCard({
   );
 }
 
-function MetricTile({
-  icon: Icon,
+function MiniStat({
   label,
   value,
-  accent,
+  icon: Icon,
+  color,
 }: {
-  icon: LucideIcon;
   label: string;
   value: string;
-  accent: string;
+  icon: LucideIcon;
+  color: string;
 }) {
   return (
-    <View className="mb-3 w-[48.5%] rounded-[22px] border border-white/8 bg-[#11192B] px-4 py-4">
+    <View className="mb-3 w-[48.4%] rounded-[22px] border border-white/8 bg-[#111B30] px-4 py-4">
       <View
-        className="mb-4 h-11 w-11 items-center justify-center rounded-2xl"
-        style={{ backgroundColor: accent }}
+        className="mb-4 h-11 w-11 items-center justify-center rounded-[16px]"
+        style={{ backgroundColor: color }}
       >
-        <Icon size={20} color="#E5F0FF" strokeWidth={2.3} />
+        <Icon size={20} color="#F4F8FF" strokeWidth={2.3} />
       </View>
 
-      <Text className="text-[13px] font-medium uppercase tracking-[1px] text-[#8D97A9]">
+      <Text
+        style={[fontStyle("500")]}
+        className="text-[12px] uppercase tracking-[1px] text-[#8D9AB0]"
+      >
         {label}
       </Text>
-      <Text className="mt-2 text-[24px] font-extrabold text-white">
+
+      <Text style={[fontStyle("700")]} className="mt-2 text-[23px] text-white">
         {value}
       </Text>
     </View>
   );
 }
 
-function SectionHeader({
-  title,
-  subtitle,
-  action,
-}: {
-  title: string;
-  subtitle?: string;
-  action?: React.ReactNode;
-}) {
-  return (
-    <View className="mb-4 flex-row items-end justify-between">
-      <View className="flex-1 pr-4">
-        <Text className="text-[20px] font-extrabold tracking-tight text-white">
-          {title}
-        </Text>
-        {subtitle ? (
-          <Text className="mt-1 text-[14px] leading-6 text-[#8A94A7]">
-            {subtitle}
-          </Text>
-        ) : null}
-      </View>
-      {action}
-    </View>
-  );
-}
-
-function MatchCard({ item }: { item: MatchCardType }) {
+function OpportunityCard({ item }: { item: OpportunityCardType }) {
   const Icon = item.icon;
 
   return (
@@ -292,70 +625,118 @@ function MatchCard({ item }: { item: MatchCardType }) {
       colors={item.colors}
       start={{ x: 0, y: 0 }}
       end={{ x: 1, y: 1 }}
-      style={{ width: 302, borderRadius: 28, padding: 20, marginRight: 16 }}
+      style={{ width: 300, borderRadius: 28, padding: 20, marginRight: 16 }}
     >
-      <View className="absolute right-[-8] top-[-12] h-28 w-28 rounded-full bg-white/10" />
+      <View className="absolute right-[-12] top-[-16] h-28 w-28 rounded-full bg-white/12" />
+      <View className="absolute bottom-[-18] left-[-8] h-20 w-20 rounded-full bg-[#0A1C64]/15" />
 
       <View className="flex-row items-center justify-between">
-        <View className="self-start rounded-full bg-white/15 px-3 py-1.5">
-          <Text className="text-[11px] font-extrabold uppercase tracking-[1.5px] text-white">
-            {item.type}
+        <View className="rounded-full bg-white/15 px-3 py-1.5">
+          <Text
+            style={[fontStyle("700")]}
+            className="text-[11px] uppercase tracking-[1.2px] text-white"
+          >
+            Launchpad Pick
           </Text>
         </View>
 
-        <View className="h-11 w-11 items-center justify-center rounded-2xl bg-white/12">
+        <View className="h-11 w-11 items-center justify-center rounded-[18px] bg-white/16">
           <Icon size={20} color="#FFFFFF" strokeWidth={2.3} />
         </View>
       </View>
 
-      <Text className="mt-5 text-[22px] font-extrabold leading-7 text-white">
+      <Text
+        style={[fontStyle("700")]}
+        className="mt-5 text-[22px] leading-7 text-white"
+      >
         {item.title}
       </Text>
 
-      <View className="mt-4 flex-row items-center">
-        <Image
-          source={{ uri: item.logo }}
-          resizeMode="cover"
-          className="h-11 w-11 rounded-2xl border border-white/15 bg-white/10"
-        />
-        <View className="ml-3 flex-1">
-          <Text className="text-[15px] font-bold text-white">
-            {item.organization}
-          </Text>
-          <Text className="mt-0.5 text-[13px] text-white/85">
-            {item.subtitle}
-          </Text>
-        </View>
-      </View>
+      <Text
+        style={[fontStyle("500")]}
+        className="mt-2 text-[15px] text-white/90"
+      >
+        {item.org}
+      </Text>
+
+      <Text
+        style={[fontStyle("400")]}
+        className="mt-3 text-[14px] leading-6 text-[#EFF5FF]"
+      >
+        {item.description}
+      </Text>
 
       <View className="mt-4 self-start rounded-full bg-white/15 px-3 py-1.5">
-        <Text className="text-[12px] font-bold text-white">{item.meta}</Text>
+        <Text style={[fontStyle("700")]} className="text-[12px] text-white">
+          {item.meta}
+        </Text>
       </View>
 
       <Pressable
         onPress={() => router.push(item.route as never)}
-        className="mt-6 flex-row items-center self-start rounded-[16px] bg-white px-5 py-3.5"
+        className="mt-6 self-start overflow-hidden rounded-full"
       >
-        <Text className="text-[15px] font-extrabold text-[#111827]">
-          {item.cta}
-        </Text>
-        <ArrowRight
-          size={16}
-          color="#111827"
-          strokeWidth={2.5}
-          style={{ marginLeft: 6 }}
-        />
+        <LinearGradient
+          colors={["#2E45FF", "#4359FF", "#2D37E6"]}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          className="flex-row items-center rounded-full px-5 py-3"
+        >
+          <Text style={[fontStyle("700")]} className="text-[15px] text-white">
+            {item.action}
+          </Text>
+          <ArrowRight
+            size={16}
+            color="#FFFFFF"
+            strokeWidth={2.5}
+            style={{ marginLeft: 6 }}
+          />
+        </LinearGradient>
       </Pressable>
     </LinearGradient>
   );
 }
 
-function FeedCard({ item }: { item: FeedItemType }) {
+function ConnectRow({ peer }: { peer: PeerType }) {
+  return (
+    <View className="flex-row items-center justify-between py-3">
+      <View className="mr-4 flex-1 flex-row items-center">
+        <Image
+          source={{ uri: peer.avatar }}
+          className="mr-3 h-12 w-12 rounded-full"
+        />
+
+        <View className="flex-1">
+          <Text style={[fontStyle("700")]} className="text-[15px] text-white">
+            {peer.name}
+          </Text>
+          <Text
+            style={[fontStyle("400")]}
+            className="mt-1 text-[13px] text-[#96A4BA]"
+          >
+            {peer.school} • {peer.course}
+          </Text>
+        </View>
+      </View>
+
+      <Pressable
+        onPress={() => router.push("/profile" as never)}
+        className="rounded-full border border-white/10 bg-white/5 px-4 py-2.5"
+      >
+        <Text style={[fontStyle("500")]} className="text-[13px] text-[#E6EEFA]">
+          Connect
+        </Text>
+      </Pressable>
+    </View>
+  );
+}
+
+function ActivityCard({ item }: { item: FeedType }) {
   const Icon = item.icon;
 
   return (
-    <GlassCard className="mb-4 px-4 py-4">
-      <View className="flex-row">
+    <GlassPanel className="mb-4 px-4 py-4">
+      <View className="flex-row items-start">
         <View
           className="mr-4 h-12 w-12 items-center justify-center rounded-[16px]"
           style={{ backgroundColor: item.iconBg }}
@@ -364,420 +745,290 @@ function FeedCard({ item }: { item: FeedItemType }) {
         </View>
 
         <View className="flex-1">
-          <Text className="text-[16px] font-bold text-white">{item.title}</Text>
-          <Text className="mt-1 text-[14px] leading-6 text-[#94A3B8]">
+          <Text style={[fontStyle("700")]} className="text-[15px] text-white">
+            {item.title}
+          </Text>
+          <Text
+            style={[fontStyle("400")]}
+            className="mt-1 text-[13px] leading-6 text-[#94A3B8]"
+          >
             {item.subtitle}
           </Text>
-          <Text className="mt-3 text-[12px] font-bold tracking-[1px] text-[#64748B]">
-            {item.time}
-          </Text>
         </View>
+
+        <ChevronRight size={16} color="#91A3BD" strokeWidth={2.5} />
       </View>
-    </GlassCard>
+    </GlassPanel>
   );
 }
 
 export default function HomeScreen() {
   const { profile } = useLaunchpad();
+  const [menuOpen, setMenuOpen] = useState(false);
 
-  const firstName = profile?.name?.split(" ")[0] || "Alex";
-
-  const profileCompletion = 84;
-  const degreeProgress = 77;
-  const employability = 91;
-  const verifiedActivities = 12;
-  const liveMatches = 26;
+  const firstName = profile?.name?.split(" ")[0] || "Michael";
 
   return (
-    <SafeAreaView edges={["top"]} className="flex-1 bg-[#050914]">
-      <ScrollView
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ paddingBottom: 160 }}
-      >
-        <View className="absolute left-[-50] top-[-20] h-56 w-56 rounded-full bg-[#2563EB]/20" />
-        <View className="absolute right-[-30] top-24 h-48 w-48 rounded-full bg-[#7C3AED]/10" />
-        <View className="absolute left-20 top-[520] h-40 w-40 rounded-full bg-[#0EA5E9]/8" />
+    <SafeAreaView edges={["bottom"]} className="flex-1 bg-[#081024]">
+      <StatusBar barStyle="light-content" />
 
-        {/* Header */}
-        <View className="px-5 pb-3 pt-2">
-          <View className="flex-row items-center justify-between">
-            <View className="flex-row items-center">
-              <LinearGradient
-                colors={["#3B82F6", "#2563EB", "#1E40AF"]}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 1 }}
-                className="mr-3 h-11 w-11 items-center justify-center rounded-2xl"
+      <View className="flex-1 bg-[#081024]">
+        {/* Background */}
+        <LinearGradient
+          colors={["#071022", "#071020", "#0B1D54"]}
+          start={{ x: 0.02, y: 0.1 }}
+          end={{ x: 1, y: 1 }}
+          className="absolute inset-0"
+        />
+
+        <View className="absolute left-[-70] top-[120] h-64 w-64 rounded-full bg-[#0A1642]" />
+        <View className="absolute right-[-30] top-[40] h-80 w-80 rounded-full bg-[#1E49E8]/20" />
+        <View className="absolute right-[10] top-[220] h-48 w-48 rounded-full bg-[#3A6BFF]/10" />
+        <View className="absolute left-[20] top-[540] h-52 w-52 rounded-full bg-[#09162F]" />
+
+        {/* Static top row only */}
+        <StaticHeader
+          onMenuPress={() => setMenuOpen(true)}
+          onProfilePress={() => router.push("/profile" as never)}
+          profileName={profile?.name || "Michael Doe"}
+          profileAvatar={profile?.avatar}
+        />
+
+        <MenuPopover visible={menuOpen} onClose={() => setMenuOpen(false)} />
+
+        {/* Scroll content */}
+        <ScrollView
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={{
+            paddingTop: 96,
+            paddingBottom: 150,
+          }}
+        >
+          <View className="px-5">
+            {/* Greeting block scrolls */}
+            <View className="pt-4">
+              <Text
+                style={[fontStyle("400")]}
+                className="text-[18px] text-[#A8B1C2]"
               >
-                <Sparkles size={18} color="#FFFFFF" strokeWidth={2.4} />
-              </LinearGradient>
+                Hi..! {firstName}
+              </Text>
 
-              <View>
-                <Text className="text-[13px] font-bold uppercase tracking-[2px] text-[#60A5FA]">
-                  Launchpad
-                </Text>
-                <Text className="mt-0.5 text-[17px] font-extrabold text-white">
-                  Student Career OS
-                </Text>
-              </View>
-            </View>
-
-            <View className="flex-row items-center">
-              <ActionIconButton
-                icon={MessageSquare}
-                onPress={() => router.push("/messages" as never)}
-                badge={3}
-              />
-
-              <ActionIconButton
-                icon={Bell}
-                onPress={() => router.push("/notifications")}
-                badge={2}
-              />
-
-              <AvatarBubble
-                name={profile?.name || "Alex Doe"}
-                uri={profile?.avatar}
-              />
-            </View>
-          </View>
-        </View>
-
-        <View className="px-5 pt-2">
-          {/* Hero */}
-          <LinearGradient
-            colors={["#0E1728", "#0D1A36", "#091120"]}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 1 }}
-            className="mb-8 overflow-hidden rounded-[32px] border border-white/10 px-5 py-6"
-          >
-            <View className="absolute right-[-20] top-[-10] h-40 w-40 rounded-full bg-[#3B82F6]/18" />
-            <View className="absolute bottom-[-24] left-[-12] h-28 w-28 rounded-full bg-[#8B5CF6]/10" />
-
-            <View className="mb-4 flex-row items-center self-start rounded-full border border-[#60A5FA]/20 bg-[#0B1430] px-3 py-1.5">
-              <Brain size={14} color="#60A5FA" strokeWidth={2.4} />
-              <Text className="ml-2 text-[12px] font-bold uppercase tracking-[1.5px] text-[#93C5FD]">
-                NEXT BEST MOVE
+              <Text
+                style={[fontStyle("500")]}
+                className="mt-2 max-w-[270px] text-[34px] leading-[42px] text-white"
+              >
+                How can Launchpad support your journey today?
               </Text>
             </View>
 
-            <Text className="text-[31px] font-extrabold tracking-tight text-white">
-              Hi, {firstName} 👋
-            </Text>
-
-            <Text className="mt-3 text-[15px] leading-7 text-[#A8B3C7]">
-              Your profile is trending well. Launchpad recommends completing one
-              research-backed elective and applying to 2 high-fit internships
-              this week.
-            </Text>
-
-            <GlassCard className="mt-5 px-4 py-4">
-              <View className="flex-row items-start justify-between">
-                <View className="flex-1 pr-4">
-                  <Text className="text-[12px] font-bold uppercase tracking-[1.2px] text-[#60A5FA]">
-                    AI Recommendation
-                  </Text>
-                  <Text className="mt-2 text-[18px] font-extrabold text-white">
-                    Add a verified research or volunteer activity to unlock
-                    stronger scholarship and internship matches.
-                  </Text>
-                </View>
-
-                <View className="h-12 w-12 items-center justify-center rounded-2xl bg-[#0F235B]">
-                  <Sparkles size={20} color="#93C5FD" strokeWidth={2.4} />
-                </View>
-              </View>
-            </GlassCard>
-
-            <View className="mt-5 flex-row items-center">
-              <Pressable
-                onPress={() => router.push("/(tabs)/roadmap")}
-                className="mr-3 flex-row items-center rounded-[16px] bg-[#2563EB] px-5 py-3.5"
-              >
-                <Text className="text-[15px] font-extrabold text-white">
-                  Open roadmap
-                </Text>
-                <ArrowRight
-                  size={16}
-                  color="#FFFFFF"
-                  strokeWidth={2.5}
-                  style={{ marginLeft: 6 }}
-                />
-              </Pressable>
-
-              <Pressable
-                onPress={() => router.push("/(tabs)/opportunities")}
-                className="flex-row items-center rounded-[16px] border border-white/10 bg-white/5 px-5 py-3.5"
-              >
-                <Search size={16} color="#C7D2FE" strokeWidth={2.3} />
-                <Text className="ml-2 text-[15px] font-bold text-[#E2E8F0]">
-                  Explore matches
-                </Text>
-              </Pressable>
-            </View>
-          </LinearGradient>
-
-          {/* Metrics */}
-          <SectionHeader
-            title="Your Snapshot"
-            subtitle="The numbers that matter most for academic and career momentum."
-          />
-
-          <View className="mb-6 flex-row flex-wrap justify-between">
-            <MetricTile
-              icon={GraduationCap}
-              label="Degree Progress"
-              value={`${degreeProgress}%`}
-              accent="#102A63"
-            />
-            <MetricTile
-              icon={TrendingUp}
-              label="Career Readiness"
-              value={`${employability}%`}
-              accent="#1E1B4B"
-            />
-            <MetricTile
-              icon={CircleCheckBig}
-              label="Verified Activities"
-              value={`${verifiedActivities}`}
-              accent="#0F3B2D"
-            />
-            <MetricTile
-              icon={Target}
-              label="Live Matches"
-              value={`${liveMatches}`}
-              accent="#3B1A52"
-            />
-          </View>
-
-          {/* Progress rail */}
-          <GlassCard className="mb-8 px-5 py-5">
-            <View className="flex-row items-start justify-between">
-              <View className="flex-1 pr-4">
-                <Text className="text-[18px] font-extrabold text-white">
-                  Profile completion
-                </Text>
-                <Text className="mt-1 text-[14px] leading-6 text-[#94A3B8]">
-                  Complete your portfolio links and supervisor verifications to
-                  improve match quality.
-                </Text>
-              </View>
-
-              <View className="rounded-full border border-emerald-500/20 bg-emerald-500/10 px-4 py-1.5">
-                <Text className="text-[12px] font-extrabold tracking-[1px] text-[#34D399]">
-                  ON TRACK
-                </Text>
-              </View>
+            {/* Main hero card */}
+            <View className="mt-6">
+              <HeroCard />
             </View>
 
-            <View className="mt-5 h-3 overflow-hidden rounded-full bg-[#06101E]">
-              <LinearGradient
-                colors={["#2563EB", "#60A5FA"]}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 0 }}
-                style={{
-                  width: `${profileCompletion}%`,
-                  height: "100%",
-                  borderRadius: 999,
-                }}
-              />
-            </View>
-
-            <View className="mt-3 flex-row items-center justify-between">
-              <Text className="text-[13px] font-semibold text-[#8D97A9]">
-                Profile verified
-              </Text>
-              <Text className="text-[14px] font-extrabold text-white">
-                {profileCompletion}%
-              </Text>
-            </View>
-          </GlassCard>
-
-          {/* Opportunities */}
-          <SectionHeader
-            title="High-fit opportunities"
-            subtitle="Recommended for your course, profile, and recent activity."
-            action={
-              <Pressable className="flex-row items-center rounded-full border border-white/10 bg-white/5 px-3 py-2">
-                <RefreshCw size={14} color="#60A5FA" strokeWidth={2.4} />
-                <Text className="ml-2 text-[12px] font-bold uppercase tracking-[1px] text-[#60A5FA]">
-                  Refresh
-                </Text>
-              </Pressable>
-            }
-          />
-
-          <ScrollView
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            className="mb-8"
-          >
-            {matchCards.map((item) => (
-              <MatchCard key={item.id} item={item} />
-            ))}
-          </ScrollView>
-
-          {/* Skills + CV */}
-          <SectionHeader
-            title="Strengths & CV autopilot"
-            subtitle="What Launchpad already sees, and what it can update for you."
-          />
-
-          <GlassCard className="mb-8 px-5 py-5">
-            <View className="flex-row flex-wrap">
-              {skills.map((skill, index) => (
-                <View
-                  key={skill}
-                  className={`mb-3 mr-3 rounded-[14px] px-4 py-2.5 ${
-                    index < 4
-                      ? "border border-[#1D4ED8]/30 bg-[#101B38]"
-                      : "border border-dashed border-white/20 bg-transparent"
-                  }`}
-                >
-                  <Text
-                    className={`text-[14px] font-semibold ${
-                      index < 4 ? "text-[#7CB7FF]" : "text-[#94A3B8]"
-                    }`}
-                  >
-                    {skill}
-                  </Text>
-                </View>
-              ))}
-            </View>
-
-            <LinearGradient
-              colors={["#0A1224", "#0E1830"]}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 1 }}
-              className="mt-3 rounded-[24px] border border-white/8 px-4 py-4"
+            {/* Quick pills */}
+            <ScrollView
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={{ paddingRight: 20 }}
+              className="mt-5"
             >
-              <View className="flex-row items-center justify-between">
-                <View className="mr-4 flex-1 flex-row items-center">
-                  <View className="mr-4 h-14 w-14 items-center justify-center rounded-2xl bg-[#102A63]">
-                    <FileText size={22} color="#7CB7FF" strokeWidth={2.3} />
+              {quickActions.map((item) => (
+                <QuickActionPill key={item.id} item={item} />
+              ))}
+            </ScrollView>
+
+            {/* Extra content to make home page feel full */}
+            <View className="mt-8">
+              <SectionTitle
+                title="For you today"
+                actionLabel="See all"
+                onPress={() => router.push("/notifications" as never)}
+              />
+
+              <GlassPanel className="px-4 py-4">
+                <View className="flex-row items-start justify-between">
+                  <View className="mr-4 flex-1">
+                    <Text
+                      style={[fontStyle("700")]}
+                      className="text-[16px] text-white"
+                    >
+                      Smart next step
+                    </Text>
+                    <Text
+                      style={[fontStyle("400")]}
+                      className="mt-2 text-[14px] leading-6 text-[#95A3B8]"
+                    >
+                      Complete one verified experience and refresh your profile
+                      to unlock stronger internship and scholarship matches.
+                    </Text>
                   </View>
 
-                  <View className="flex-1">
-                    <Text className="text-[16px] font-extrabold text-white">
-                      Auto-update CV
-                    </Text>
-                    <Text className="mt-1 text-[14px] leading-6 text-[#94A3B8]">
-                      2 newly verified activities are ready to be added to your
-                      CV.
-                    </Text>
+                  <View className="h-12 w-12 items-center justify-center rounded-[18px] bg-[#11254A]">
+                    <Sparkles size={20} color="#7EB7FF" strokeWidth={2.3} />
                   </View>
                 </View>
 
-                <Pressable
-                  onPress={() => router.push("/(tabs)/cv")}
-                  className="rounded-[14px] bg-[#2563EB] px-4 py-3"
-                >
-                  <Text className="text-[14px] font-extrabold text-white">
-                    Update
-                  </Text>
-                </Pressable>
-              </View>
-            </LinearGradient>
-          </GlassCard>
+                <View className="mt-5 h-3 overflow-hidden rounded-full bg-[#081121]">
+                  <LinearGradient
+                    colors={["#2A63FF", "#69B5FF"]}
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 1, y: 0 }}
+                    style={{ width: "78%", height: "100%" }}
+                  />
+                </View>
 
-          {/* Network block */}
-          <SectionHeader
-            title="People on your path"
-            subtitle="Students in other universities doing the same course."
-            action={
-              <Pressable
-                onPress={() => router.push("/(tabs)/profile")}
-                className="flex-row items-center"
-              >
-                <Text className="text-[13px] font-extrabold uppercase tracking-[1px] text-[#60A5FA]">
-                  View all
-                </Text>
-                <ChevronRight
-                  size={15}
-                  color="#60A5FA"
-                  strokeWidth={2.6}
-                  style={{ marginLeft: 4 }}
+                <View className="mt-3 flex-row items-center justify-between">
+                  <Text
+                    style={[fontStyle("400")]}
+                    className="text-[13px] text-[#8EA0B7]"
+                  >
+                    Career readiness progress
+                  </Text>
+                  <Text
+                    style={[fontStyle("700")]}
+                    className="text-[13px] text-white"
+                  >
+                    78%
+                  </Text>
+                </View>
+              </GlassPanel>
+            </View>
+
+            <View className="mt-8">
+              <SectionTitle title="Your snapshot" />
+
+              <View className="flex-row flex-wrap justify-between">
+                <MiniStat
+                  label="Profile"
+                  value="84%"
+                  icon={Target}
+                  color="#14305E"
                 />
-              </Pressable>
-            }
-          />
-
-          <GlassCard className="mb-8 px-5 py-5">
-            <View className="mb-4 flex-row items-center justify-between">
-              <View className="flex-row items-center">
-                <View className="mr-3 h-11 w-11 items-center justify-center rounded-2xl bg-[#0F235B]">
-                  <Users size={20} color="#93C5FD" strokeWidth={2.3} />
-                </View>
-                <View>
-                  <Text className="text-[16px] font-extrabold text-white">
-                    Cross-campus network
-                  </Text>
-                  <Text className="mt-1 text-[13px] text-[#94A3B8]">
-                    Connect, compare progress, and discover shared
-                    opportunities.
-                  </Text>
-                </View>
+                <MiniStat
+                  label="CV Score"
+                  value="91%"
+                  icon={FileText}
+                  color="#1C1D4F"
+                />
+                <MiniStat
+                  label="Matches"
+                  value="26"
+                  icon={Search}
+                  color="#163C2E"
+                />
+                <MiniStat
+                  label="Growth"
+                  value="+12"
+                  icon={TrendingUp}
+                  color="#422052"
+                />
               </View>
             </View>
 
-            {peers.map((peer, index) => (
-              <View
-                key={peer.id}
-                className={`flex-row items-center justify-between ${
-                  index !== peers.length - 1
-                    ? "mb-4 border-b border-white/6 pb-4"
-                    : ""
-                }`}
+            <View className="mt-5">
+              <SectionTitle
+                title="Top opportunities"
+                actionLabel="Refresh"
+                onPress={() => router.push("/(tabs)/opportunities" as never)}
+              />
+
+              <ScrollView
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                contentContainerStyle={{ paddingRight: 20 }}
               >
-                <View className="mr-4 flex-1 flex-row items-center">
-                  <Image
-                    source={{ uri: peer.avatar }}
-                    className="mr-3 h-11 w-11 rounded-full"
-                  />
+                {opportunities.map((item) => (
+                  <OpportunityCard key={item.id} item={item} />
+                ))}
+              </ScrollView>
+            </View>
 
-                  <View className="flex-1">
-                    <View className="flex-row items-center">
-                      <Text className="text-[15px] font-bold text-white">
-                        {peer.name}
-                      </Text>
+            <View className="mt-8">
+              <SectionTitle title="CV autopilot" />
 
-                      <View className="ml-2 h-6 w-6 overflow-hidden rounded-full border border-white/10">
-                        <Image
-                          source={{ uri: getSchoolBadge(peer.school) }}
-                          resizeMode="cover"
-                          className="h-full w-full"
-                        />
-                      </View>
+              <GlassPanel className="px-4 py-4">
+                <View className="flex-row items-center justify-between">
+                  <View className="mr-4 flex-1 flex-row items-center">
+                    <View className="mr-4 h-14 w-14 items-center justify-center rounded-[20px] bg-[#123067]">
+                      <FileText size={22} color="#81B8FF" strokeWidth={2.3} />
                     </View>
 
-                    <Text className="mt-0.5 text-[13px] text-[#94A3B8]">
-                      {peer.school} • {peer.course}
-                    </Text>
+                    <View className="flex-1">
+                      <Text
+                        style={[fontStyle("700")]}
+                        className="text-[16px] text-white"
+                      >
+                        Ready to update your CV
+                      </Text>
+                      <Text
+                        style={[fontStyle("400")]}
+                        className="mt-1 text-[13px] leading-6 text-[#95A3B8]"
+                      >
+                        Two verified activities can already be added to your CV.
+                      </Text>
+                    </View>
                   </View>
+
+                  <Pressable
+                    onPress={() => router.push("/(tabs)/cv" as never)}
+                    className="overflow-hidden rounded-full"
+                  >
+                    <LinearGradient
+                      colors={["#2E45FF", "#4659FF", "#2B38EE"]}
+                      className="rounded-full px-4 py-3"
+                    >
+                      <Text
+                        style={[fontStyle("700")]}
+                        className="text-[13px] text-white"
+                      >
+                        Update
+                      </Text>
+                    </LinearGradient>
+                  </Pressable>
                 </View>
+              </GlassPanel>
+            </View>
 
-                <Pressable
-                  onPress={() => router.push("/(tabs)/profile")}
-                  className="rounded-[14px] border border-white/10 bg-white/5 px-4 py-2.5"
-                >
-                  <Text className="text-[13px] font-bold text-[#E2E8F0]">
-                    Connect
-                  </Text>
-                </Pressable>
-              </View>
-            ))}
-          </GlassCard>
+            <View className="mt-8">
+              <SectionTitle
+                title="People to connect with"
+                actionLabel="View all"
+                onPress={() => router.push("/(tabs)/profile" as never)}
+              />
 
-          {/* Feed */}
-          <SectionHeader
-            title="Recent activity"
-            subtitle="Verified and social updates affecting your profile strength."
-          />
+              <GlassPanel className="px-4 py-2">
+                {peers.map((peer, index) => (
+                  <View
+                    key={peer.id}
+                    className={
+                      index !== peers.length - 1
+                        ? "border-b border-white/6"
+                        : ""
+                    }
+                  >
+                    <ConnectRow peer={peer} />
+                  </View>
+                ))}
+              </GlassPanel>
+            </View>
 
-          {activityFeed.map((item) => (
-            <FeedCard key={item.id} item={item} />
-          ))}
-        </View>
-      </ScrollView>
+            {/* Keep recent activity last */}
+            <View className="mt-8">
+              <SectionTitle
+                title="Recent activity"
+                actionLabel="See all"
+                onPress={() => router.push("/notifications" as never)}
+              />
+
+              {activityFeed.map((item) => (
+                <ActivityCard key={item.id} item={item} />
+              ))}
+            </View>
+          </View>
+        </ScrollView>
+      </View>
     </SafeAreaView>
   );
 }
