@@ -1,12 +1,14 @@
 import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";
 import {
-  ArrowRight,
-  Eye,
-  EyeOff,
-  LockKeyhole,
-  Mail,
-  Sparkles,
+    ArrowLeft,
+    ArrowRight,
+    GraduationCap,
+    LockKeyhole,
+    Mail,
+    School,
+    Sparkles,
+    UserRound,
 } from "lucide-react-native";
 import React, { useState } from "react";
 import { Pressable, ScrollView, Text, TextInput, View } from "react-native";
@@ -18,16 +20,12 @@ function AuthInput({
   onChangeText,
   placeholder,
   icon,
-  secureTextEntry,
-  right,
 }: {
   label: string;
   value: string;
   onChangeText: (text: string) => void;
   placeholder: string;
   icon: React.ReactNode;
-  secureTextEntry?: boolean;
-  right?: React.ReactNode;
 }) {
   return (
     <View className="mb-4">
@@ -41,19 +39,20 @@ function AuthInput({
           onChangeText={onChangeText}
           placeholder={placeholder}
           placeholderTextColor="#64748B"
-          secureTextEntry={secureTextEntry}
           className="flex-1 py-4 text-[15px] text-white"
         />
-        {right}
       </View>
     </View>
   );
 }
 
-export default function LoginScreen() {
+export default function SignupScreen() {
+  const [fullName, setFullName] = useState("");
+  const [school, setSchool] = useState("");
+  const [degree, setDegree] = useState("");
+  const [year, setYear] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [hidden, setHidden] = useState(true);
 
   return (
     <SafeAreaView edges={["top"]} className="flex-1 bg-[#050914]">
@@ -65,23 +64,12 @@ export default function LoginScreen() {
         <View className="absolute right-[-20] top-28 h-44 w-44 rounded-full bg-[#7C3AED]/10" />
 
         <View className="px-5 pt-4">
-          <View className="mb-8 flex-row items-center">
-            <LinearGradient
-              colors={["#3B82F6", "#2563EB", "#1E40AF"]}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 1 }}
-              className="mr-3 h-12 w-12 items-center justify-center rounded-2xl"
-            >
-              <Sparkles size={20} color="#FFFFFF" strokeWidth={2.4} />
-            </LinearGradient>
-
-            <View>
-              <Text className="text-2xl font-black tracking-tight text-white">
-                Launchpad
-              </Text>
-              <Text className="text-sm text-slate-400">Welcome back</Text>
-            </View>
-          </View>
+          <Pressable
+            onPress={() => router.back()}
+            className="mb-6 h-11 w-11 items-center justify-center rounded-2xl border border-white/10 bg-white/5"
+          >
+            <ArrowLeft size={18} color="#E2E8F0" strokeWidth={2.4} />
+          </Pressable>
 
           <LinearGradient
             colors={["#0E1728", "#0D1A36", "#091120"]}
@@ -93,21 +81,55 @@ export default function LoginScreen() {
 
             <View className="mb-4 self-start rounded-full border border-[#60A5FA]/20 bg-[#0B1430] px-3 py-1.5">
               <Text className="text-[11px] font-bold uppercase tracking-[1.4px] text-[#93C5FD]">
-                Sign in
+                Create account
               </Text>
             </View>
 
             <Text className="text-[30px] font-extrabold tracking-tight text-white">
-              Continue your journey
+              Start with your basics
             </Text>
 
             <Text className="mt-3 text-[15px] leading-7 text-[#A8B3C7]">
-              Access your roadmap, opportunities, dynamic CV, messages, and AI
-              guidance.
+              Set up your Launchpad account, then continue into your
+              personalized onboarding flow.
             </Text>
           </LinearGradient>
 
           <View className="rounded-[28px] border border-white/10 bg-[#0D1424] px-5 py-5">
+            <AuthInput
+              label="Full name"
+              value={fullName}
+              onChangeText={setFullName}
+              placeholder="Enter your full name"
+              icon={<UserRound size={18} color="#94A3B8" strokeWidth={2.3} />}
+            />
+
+            <AuthInput
+              label="School"
+              value={school}
+              onChangeText={setSchool}
+              placeholder="e.g. KNUST"
+              icon={<School size={18} color="#94A3B8" strokeWidth={2.3} />}
+            />
+
+            <AuthInput
+              label="Degree / Program"
+              value={degree}
+              onChangeText={setDegree}
+              placeholder="e.g. Computer Science"
+              icon={
+                <GraduationCap size={18} color="#94A3B8" strokeWidth={2.3} />
+              }
+            />
+
+            <AuthInput
+              label="Year"
+              value={year}
+              onChangeText={setYear}
+              placeholder="e.g. Level 300 / Year 3"
+              icon={<Sparkles size={18} color="#94A3B8" strokeWidth={2.3} />}
+            />
+
             <AuthInput
               label="Email"
               value={email}
@@ -120,29 +142,13 @@ export default function LoginScreen() {
               label="Password"
               value={password}
               onChangeText={setPassword}
-              placeholder="Enter your password"
-              secureTextEntry={hidden}
+              placeholder="Create a password"
               icon={<LockKeyhole size={18} color="#94A3B8" strokeWidth={2.3} />}
-              right={
-                <Pressable onPress={() => setHidden((v) => !v)}>
-                  {hidden ? (
-                    <Eye size={18} color="#94A3B8" strokeWidth={2.3} />
-                  ) : (
-                    <EyeOff size={18} color="#94A3B8" strokeWidth={2.3} />
-                  )}
-                </Pressable>
-              }
             />
 
-            <Pressable className="mb-5 self-end">
-              <Text className="text-[13px] font-bold text-[#60A5FA]">
-                Forgot password?
-              </Text>
-            </Pressable>
-
             <Pressable
-              onPress={() => router.replace("/(tabs)/home")}
-              className="mb-4"
+              onPress={() => router.push("/(auth)/onboarding")}
+              className="mt-2"
             >
               <LinearGradient
                 colors={["#2563EB", "#1D4ED8"]}
@@ -151,7 +157,7 @@ export default function LoginScreen() {
                 className="flex-row items-center justify-center rounded-[18px] px-5 py-4"
               >
                 <Text className="text-[15px] font-extrabold text-white">
-                  Sign in
+                  Continue to onboarding
                 </Text>
                 <ArrowRight
                   size={16}
@@ -163,12 +169,12 @@ export default function LoginScreen() {
             </Pressable>
 
             <Pressable
-              onPress={() => router.push("/(auth)/signup")}
-              className="items-center py-3"
+              onPress={() => router.push("/(auth)/login")}
+              className="items-center py-4"
             >
               <Text className="text-[14px] text-[#94A3B8]">
-                Don’t have an account?{" "}
-                <Text className="font-bold text-[#60A5FA]">Create one</Text>
+                Already have an account?{" "}
+                <Text className="font-bold text-[#60A5FA]">Sign in</Text>
               </Text>
             </Pressable>
           </View>
