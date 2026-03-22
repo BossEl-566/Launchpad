@@ -25,7 +25,7 @@ import {
   ScrollView,
   StatusBar,
   Text,
-  View
+  View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -405,100 +405,139 @@ function HeroOrb() {
 
 function HeroCard() {
   return (
-    <LinearGradient
-      colors={["#2A63F8", "#4D89FF", "#F3F7FF"]}
-      start={{ x: 0.05, y: 0.05 }}
-      end={{ x: 0.95, y: 0.95 }}
-      className="overflow-hidden rounded-[28px] px-5 py-5"
+    <View
       style={{
-        minHeight: 175,
-        shadowColor: "#2C5CFF",
-        shadowOpacity: 0.22,
+        shadowColor: "#7FB2FF",
+        shadowOpacity: 0.18,
         shadowRadius: 24,
-        shadowOffset: { width: 0, height: 12 },
-        elevation: 10,
+        shadowOffset: { width: 0, height: 10 },
+        elevation: 8,
       }}
     >
-      {/* soft glow spots */}
-      <View className="absolute left-[-18] bottom-[-24] h-24 w-24 rounded-full bg-white/12" />
-      <View className="absolute right-[-10] top-[-10] h-24 w-24 rounded-full bg-white/10" />
-      <View className="absolute bottom-0 left-0 right-0 h-16 bg-white/10" />
+      <LinearGradient
+        colors={["#2C63F8", "#4F86FF", "#F4F8FF"]}
+        start={{ x: 0.03, y: 0.05 }}
+        end={{ x: 0.95, y: 0.95 }}
+        className="overflow-hidden rounded-[30px] px-5 py-5"
+        style={{
+          minHeight: 180,
+          borderWidth: 1,
+          borderColor: "rgba(255,255,255,0.22)",
+        }}
+      >
+        {/* card soft glow / highlights */}
+        <View className="absolute left-[-18] bottom-[-20] h-28 w-28 rounded-full bg-white/10" />
+        <View className="absolute right-[-10] top-[-10] h-24 w-24 rounded-full bg-white/10" />
+        <View className="absolute bottom-0 left-0 right-0 h-16 bg-white/12" />
+        <View className="absolute left-[20] top-[25] h-20 w-20 rounded-full bg-[#85BFFF]/12" />
 
-      <View className="flex-row items-center justify-between">
-        {/* left content */}
-        <View className="flex-1 pr-3">
-          <Text
-            style={{
-              fontFamily: "Roboto_700Bold",
-              fontSize: 20,
-              color: "#FFFFFF",
-            }}
-          >
-            Career Match Hub
-          </Text>
-
-          <Text
-            style={{
-              fontFamily: "Roboto_400Regular",
-              fontSize: 14,
-              lineHeight: 22,
-              color: "#EAF1FF",
-              marginTop: 8,
-              maxWidth: 210,
-            }}
-          >
-            Discover internships, scholarships and research opportunities
-            tailored to your journey.
-          </Text>
-
-          <Pressable
-            onPress={() => router.push("/(tabs)/opportunities" as never)}
-            className="mt-5 self-start overflow-hidden rounded-full"
-            style={{
-              shadowColor: "#334DFF",
-              shadowOpacity: 0.26,
-              shadowRadius: 18,
-              shadowOffset: { width: 0, height: 8 },
-              elevation: 8,
-            }}
-          >
-            <LinearGradient
-              colors={["#3457FF", "#5C63FF", "#2C3EF2"]}
-              start={{ x: 0, y: 0.2 }}
-              end={{ x: 1, y: 0.8 }}
+        <View className="flex-row items-center justify-between">
+          <View className="flex-1 pr-3">
+            <Text
               style={{
-                borderRadius: 999,
-                paddingHorizontal: 24,
-                paddingVertical: 14,
+                fontFamily: "Roboto_700Bold",
+                fontSize: 20,
+                color: "#FFFFFF",
               }}
             >
-              <Text
+              Career Match Hub
+            </Text>
+
+            <Text
+              style={{
+                fontFamily: "Roboto_400Regular",
+                fontSize: 14,
+                lineHeight: 22,
+                color: "#EAF2FF",
+                marginTop: 8,
+                maxWidth: 210,
+              }}
+            >
+              Discover internships, scholarships and research opportunities
+              tailored to your journey.
+            </Text>
+
+            {/* button area */}
+            <View className="mt-5 self-start">
+              {/* Outer glow */}
+              <View
+                pointerEvents="none"
                 style={{
-                  fontFamily: "Roboto_700Bold",
-                  fontSize: 15,
-                  color: "#FFFFFF",
+                  position: "absolute",
+                  top: 4,
+                  left: 6,
+                  right: 6,
+                  bottom: -4,
+                  borderRadius: 999,
+                  backgroundColor: "rgba(70, 100, 255, 0.45)",
+                  shadowColor: "#4C62FF",
+                  shadowOpacity: 0.6,
+                  shadowRadius: 25,
+                  shadowOffset: { width: 0, height: 8 },
+                  elevation: 15,
+                }}
+              />
+
+              <Pressable
+                onPress={() => router.push("/(tabs)/opportunities" as never)}
+                className="overflow-hidden rounded-full"
+                style={{
+                  borderWidth: 1,
+                  borderColor: "rgba(255,255,255,0.35)",
+                  shadowColor: "#4C62FF",
+                  shadowOpacity: 0.5,
+                  shadowRadius: 18,
+                  shadowOffset: { width: 0, height: 6 },
+                  elevation: 14,
                 }}
               >
-                Explore Now
-              </Text>
-            </LinearGradient>
-          </Pressable>
-        </View>
+                {/* Vertical center-focused gradient */}
+                <LinearGradient
+                  colors={[
+                    "#3a52fc",
+                    "#0616d6",
+                    "#0614c4",
+                    "#0616d6",
+                    "#3a52fc",
+                  ]}
+                  locations={[0, 0.25, 0.5, 0.75, 1]}
+                  start={{ x: 0.5, y: 0 }}
+                  end={{ x: 0.5, y: 1 }}
+                  style={{
+                    borderRadius: 999,
+                    paddingHorizontal: 26,
+                    paddingVertical: 15,
+                  }}
+                >
+                  <Text
+                    style={{
+                      fontFamily: "Roboto_700Bold",
+                      fontSize: 15,
+                      color: "#FFFFFF",
+                      textAlign: "center",
+                    }}
+                  >
+                    Explore Now
+                  </Text>
+                </LinearGradient>
+              </Pressable>
+            </View>
+          </View>
 
-        {/* right artwork */}
-        <View className="items-center justify-center">
-          <Image
-            source={require("../../assets/images/hero-blue-shape.png")}
-            resizeMode="contain"
-            style={{
-              width: 160,
-              height: 160,
-              marginRight: -6,
-            }}
-          />
+          <View className="items-center justify-center">
+            <Image
+              source={require("../../assets/images/hero-blue-shape.png")}
+              resizeMode="contain"
+              style={{
+                width: 145,
+                height: 145,
+                marginRight: -6,
+              }}
+            />
+          </View>
         </View>
-      </View>
-    </LinearGradient>
+      </LinearGradient>
+    </View>
   );
 }
 
