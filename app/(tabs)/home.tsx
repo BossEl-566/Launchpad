@@ -21,22 +21,26 @@ import {
 import React, { useMemo, useState } from "react";
 import {
   Image,
-  Platform,
   Pressable,
   ScrollView,
   StatusBar,
   Text,
-  View,
+  View
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { useLaunchpad } from "../../src/context/LaunchpadContext";
 
-const FONT = Platform.select({
-  android: "Roboto",
-  ios: "System",
-  default: "System",
-});
+function fontStyle(weight: "400" | "500" | "700" = "400") {
+  return {
+    fontFamily:
+      weight === "700"
+        ? "Roboto_700Bold"
+        : weight === "500"
+          ? "Roboto_500Medium"
+          : "Roboto_400Regular",
+  } as const;
+}
 
 type QuickAction = {
   id: string;
@@ -220,13 +224,6 @@ const activityFeed: FeedType[] = [
     iconColor: "#7BE0A1",
   },
 ];
-
-function fontStyle(weight: "400" | "500" | "700" | "900" = "400") {
-  return {
-    fontFamily: FONT,
-    fontWeight: weight,
-  } as const;
-}
 
 function Avatar({
   name,
@@ -494,8 +491,8 @@ function HeroCard() {
             source={require("../../assets/images/hero-blue-shape.png")}
             resizeMode="contain"
             style={{
-              width: 145,
-              height: 145,
+              width: 160,
+              height: 160,
               marginRight: -6,
             }}
           />
