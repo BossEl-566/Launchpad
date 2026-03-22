@@ -7,14 +7,12 @@ import {
   BriefcaseBusiness,
   ChevronRight,
   FileText,
+  Flame,
   GraduationCap,
   Menu,
   MessageSquare,
   Microscope,
-  Search,
   Sparkles,
-  Target,
-  TrendingUp,
   UserPlus,
   Users,
 } from "lucide-react-native";
@@ -28,7 +26,7 @@ import {
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-
+import Svg, { Circle } from "react-native-svg";
 import { useLaunchpad } from "../../src/context/LaunchpadContext";
 
 function fontStyle(weight: "400" | "500" | "700" = "400") {
@@ -307,6 +305,126 @@ function StaticHeader({
       </SafeAreaView>
     </View>
   );
+}
+
+function MetricProgressCard({
+  title,
+  value,
+  progress,
+  subtitle,
+  accent,
+  track,
+  route,
+}: {
+  title: string;
+  value: string;
+  progress: number;
+  subtitle: string;
+  accent: string;
+  track: string;
+  route?: string;
+}) {
+  const size = 58;
+  const strokeWidth = 5;
+  const radius = (size - strokeWidth) / 2;
+  const circumference = 2 * Math.PI * radius;
+  const strokeDashoffset = circumference - (circumference * progress) / 100;
+
+  const content = (
+    <LinearGradient
+      colors={["#101827", "#121C2F", "#111A2B"]}
+      start={{ x: 0, y: 0 }}
+      end={{ x: 1, y: 1 }}
+      className="w-[48.5%] rounded-[24px] border border-white/8 px-4 py-4"
+      style={{
+        shadowColor: "#3868FF",
+        shadowOpacity: 0.08,
+        shadowRadius: 14,
+        shadowOffset: { width: 0, height: 8 },
+        elevation: 4,
+        minHeight: 165,
+      }}
+    >
+      <View className="flex-row items-start justify-between">
+        <View className="mr-3 flex-1">
+          <Text
+            style={[fontStyle("400")]}
+            className="text-[13px] leading-5 text-[#AAB4C7]"
+          >
+            {title}
+          </Text>
+
+          <Text
+            style={[fontStyle("700")]}
+            className="mt-3 text-[28px] text-white"
+          >
+            {value}
+          </Text>
+
+          <Text
+            style={[fontStyle("400")]}
+            className="mt-1 text-[12px] text-[#8391A7]"
+          >
+            {subtitle}
+          </Text>
+        </View>
+
+        <View className="items-center justify-center">
+          <Svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
+            <Circle
+              cx={size / 2}
+              cy={size / 2}
+              r={radius}
+              stroke="rgba(255,255,255,0.10)"
+              strokeWidth={strokeWidth}
+              fill="none"
+            />
+            <Circle
+              cx={size / 2}
+              cy={size / 2}
+              r={radius}
+              stroke={accent}
+              strokeWidth={strokeWidth}
+              fill="none"
+              strokeLinecap="round"
+              strokeDasharray={`${circumference} ${circumference}`}
+              strokeDashoffset={strokeDashoffset}
+              transform={`rotate(-90 ${size / 2} ${size / 2})`}
+            />
+          </Svg>
+
+          <View className="absolute inset-0 items-center justify-center">
+            <Text style={[fontStyle("700")]} className="text-[14px]">
+              <Text style={{ color: accent }}>{progress}%</Text>
+            </Text>
+          </View>
+        </View>
+      </View>
+
+      <View className="mt-5 h-[10px] overflow-hidden rounded-full bg-[#1C2333]">
+        <LinearGradient
+          colors={[accent, "#7DA6FF"]}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 0 }}
+          style={{
+            width: `${progress}%`,
+            height: "100%",
+            borderRadius: 999,
+          }}
+        />
+      </View>
+    </LinearGradient>
+  );
+
+  if (route) {
+    return (
+      <Pressable onPress={() => router.push(route as never)}>
+        {content}
+      </Pressable>
+    );
+  }
+
+  return content;
 }
 
 function MenuPopover({
@@ -798,6 +916,180 @@ function ActivityCard({ item }: { item: FeedType }) {
   );
 }
 
+function SnapshotStatCard({
+  title,
+  mainValue,
+  subValue,
+  progress,
+  route,
+}: {
+  title: string;
+  mainValue: string;
+  subValue: string;
+  progress: number;
+  route?: string;
+}) {
+  const size = 62;
+  const strokeWidth = 6;
+  const radius = (size - strokeWidth) / 2;
+  const circumference = 2 * Math.PI * radius;
+  const dashOffset = circumference - (circumference * progress) / 100;
+
+  const content = (
+    <LinearGradient
+      colors={["#101827", "#111C31", "#0F1728"]}
+      start={{ x: 0, y: 0 }}
+      end={{ x: 1, y: 1 }}
+      className="rounded-[24px] border border-white/8 px-4 py-4"
+      style={{
+        width: "100%",
+        minHeight: 170,
+        shadowColor: "#3668FF",
+        shadowOpacity: 0.08,
+        shadowRadius: 14,
+        shadowOffset: { width: 0, height: 8 },
+        elevation: 4,
+      }}
+    >
+      <View className="flex-row items-start justify-between">
+        <View className="mr-3 flex-1">
+          <Text
+            style={[fontStyle("400")]}
+            className="text-[13px] leading-5 text-[#A8B3C7]"
+          >
+            {title}
+          </Text>
+
+          <Text
+            style={[fontStyle("700")]}
+            className="mt-3 text-[30px] text-white"
+          >
+            {mainValue}
+          </Text>
+
+          <Text
+            style={[fontStyle("400")]}
+            className="mt-1 text-[12px] text-[#7F8EA6]"
+          >
+            {subValue}
+          </Text>
+        </View>
+
+        <View
+          style={{ width: size, height: size }}
+          className="items-center justify-center"
+        >
+          <Svg width={size} height={size}>
+            <Circle
+              cx={size / 2}
+              cy={size / 2}
+              r={radius}
+              stroke="rgba(255,255,255,0.08)"
+              strokeWidth={strokeWidth}
+              fill="none"
+            />
+            <Circle
+              cx={size / 2}
+              cy={size / 2}
+              r={radius}
+              stroke="#5C84FF"
+              strokeWidth={strokeWidth}
+              fill="none"
+              strokeLinecap="round"
+              strokeDasharray={`${circumference} ${circumference}`}
+              strokeDashoffset={dashOffset}
+              transform={`rotate(-90 ${size / 2} ${size / 2})`}
+            />
+          </Svg>
+
+          <View className="absolute inset-0 items-center justify-center">
+            <Text
+              style={[fontStyle("700")]}
+              className="text-[14px] text-[#86A7FF]"
+            >
+              {progress}%
+            </Text>
+          </View>
+        </View>
+      </View>
+
+      <View className="mt-5 h-[10px] overflow-hidden rounded-full bg-[#20293A]">
+        <LinearGradient
+          colors={["#4E79FF", "#6EA9FF"]}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 0 }}
+          style={{
+            width: `${progress}%`,
+            height: "100%",
+            borderRadius: 999,
+          }}
+        />
+      </View>
+    </LinearGradient>
+  );
+
+  if (route) {
+    return (
+      <Pressable
+        onPress={() => router.push(route as never)}
+        style={{ width: "100%" }}
+      >
+        {content}
+      </Pressable>
+    );
+  }
+
+  return <View style={{ width: "100%" }}>{content}</View>;
+}
+
+function SnapshotInsightCard({
+  title,
+  subtitle,
+}: {
+  title: string;
+  subtitle: string;
+}) {
+  return (
+    <LinearGradient
+      colors={["#121A2C", "#101827", "#0F1726"]}
+      start={{ x: 0, y: 0 }}
+      end={{ x: 1, y: 1 }}
+      className="mt-4 rounded-[24px] border border-white/8 px-4 py-4"
+      style={{
+        shadowColor: "#3C6BFF",
+        shadowOpacity: 0.07,
+        shadowRadius: 12,
+        shadowOffset: { width: 0, height: 6 },
+        elevation: 3,
+      }}
+    >
+      <View className="flex-row items-center">
+        <View className="mr-4 h-14 w-14 items-center justify-center rounded-full bg-[#2A1D24]">
+          <View className="h-10 w-10 items-center justify-center rounded-full bg-[#3A232A]">
+            <Flame size={20} color="#FF8B4D" strokeWidth={2.2} />
+          </View>
+        </View>
+
+        <View className="flex-1">
+          <Text
+            style={[fontStyle("500")]}
+            className="text-[18px] leading-7 text-white"
+          >
+            {title}
+          </Text>
+
+          <Text
+            style={[fontStyle("400")]}
+            className="mt-1 text-[13px] leading-6 text-[#95A3B8]"
+          >
+            {subtitle}
+          </Text>
+        </View>
+      </View>
+    </LinearGradient>
+  );
+}
+
 export default function HomeScreen() {
   const { profile } = useLaunchpad();
   const [menuOpen, setMenuOpen] = useState(false);
@@ -809,19 +1101,6 @@ export default function HomeScreen() {
       <StatusBar barStyle="light-content" />
 
       <View className="flex-1 bg-[#081024]">
-        {/* Background */}
-        <LinearGradient
-          colors={["#071022", "#071020", "#0B1D54"]}
-          start={{ x: 0.02, y: 0.1 }}
-          end={{ x: 1, y: 1 }}
-          className="absolute inset-0"
-        />
-
-        <View className="absolute left-[-70] top-[120] h-64 w-64 rounded-full bg-[#0A1642]" />
-        <View className="absolute right-[-30] top-[40] h-80 w-80 rounded-full bg-[#1E49E8]/20" />
-        <View className="absolute right-[10] top-[220] h-48 w-48 rounded-full bg-[#3A6BFF]/10" />
-        <View className="absolute left-[20] top-[540] h-52 w-52 rounded-full bg-[#09162F]" />
-
         {/* Static top row only */}
         <StaticHeader
           onMenuPress={() => setMenuOpen(true)}
@@ -935,32 +1214,32 @@ export default function HomeScreen() {
             <View className="mt-8">
               <SectionTitle title="Your snapshot" />
 
-              <View className="flex-row flex-wrap justify-between">
-                <MiniStat
-                  label="Profile"
-                  value="84%"
-                  icon={Target}
-                  color="#14305E"
-                />
-                <MiniStat
-                  label="CV Score"
-                  value="91%"
-                  icon={FileText}
-                  color="#1C1D4F"
-                />
-                <MiniStat
-                  label="Matches"
-                  value="26"
-                  icon={Search}
-                  color="#163C2E"
-                />
-                <MiniStat
-                  label="Growth"
-                  value="+12"
-                  icon={TrendingUp}
-                  color="#422052"
-                />
+              <View className="mt-4 flex-row">
+                <View style={{ flex: 1, marginRight: 6 }}>
+                  <SnapshotStatCard
+                    title="Profile completion"
+                    mainValue="84%"
+                    subValue="18/22 completed"
+                    progress={84}
+                    route="/profile"
+                  />
+                </View>
+
+                <View style={{ flex: 1, marginLeft: 6 }}>
+                  <SnapshotStatCard
+                    title="CV strength"
+                    mainValue="91%"
+                    subValue="Strong visibility"
+                    progress={91}
+                    route="/(tabs)/cv"
+                  />
+                </View>
               </View>
+
+              <SnapshotInsightCard
+                title="You’re ahead of 68% of similar students"
+                subtitle="Complete one more verified activity to improve your match quality."
+              />
             </View>
 
             <View className="mt-5">
