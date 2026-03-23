@@ -1,8 +1,8 @@
+import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 import { LinearGradient } from "expo-linear-gradient";
 import type { LucideIcon } from "lucide-react-native";
 import {
   ArrowUpRight,
-  Bell,
   Bot,
   BriefcaseBusiness,
   FileText,
@@ -37,6 +37,7 @@ type ModeItem = {
   label?: string;
   icon: LucideIcon;
   active?: boolean;
+  colors: [string, string, string];
 };
 
 type PromptCardItem = {
@@ -44,35 +45,60 @@ type PromptCardItem = {
   title: string;
   subtitle: string;
   icon: LucideIcon;
-  accent: string;
+  iconBg: string;
+  colors: [string, string, string];
 };
 
 type HistoryItem = {
   id: string;
   title: string;
   icon: LucideIcon;
+  colors: [string, string, string];
 };
 
-function AppShellCard({
+function GlowShell({
   children,
-  className = "",
+  colors,
+  radius = 28,
+  innerRadius,
+  innerBg = "#0C1322",
+  outerStyle,
+  innerStyle,
 }: {
   children: React.ReactNode;
-  className?: string;
+  colors: [string, string, string];
+  radius?: number;
+  innerRadius?: number;
+  innerBg?: string;
+  outerStyle?: any;
+  innerStyle?: any;
 }) {
   return (
-    <View
-      className={`overflow-hidden rounded-[30px] border border-white/8 bg-[#0D1422] ${className}`}
-      style={{
-        shadowColor: "#2563EB",
-        shadowOpacity: 0.08,
-        shadowRadius: 18,
-        shadowOffset: { width: 0, height: 8 },
-        elevation: 4,
-      }}
+    <LinearGradient
+      colors={colors}
+      start={{ x: 0, y: 0 }}
+      end={{ x: 1, y: 1 }}
+      style={[
+        {
+          borderRadius: radius,
+          padding: 1.2,
+        },
+        outerStyle,
+      ]}
     >
-      {children}
-    </View>
+      <View
+        style={[
+          {
+            borderRadius: innerRadius ?? radius - 2,
+            backgroundColor: innerBg,
+            overflow: "hidden",
+          },
+          innerStyle,
+        ]}
+      >
+        {children}
+      </View>
+    </LinearGradient>
   );
 }
 
@@ -81,24 +107,86 @@ function ModeChip({ item }: { item: ModeItem }) {
 
   if (item.active) {
     return (
-      <Pressable className="mr-3 h-16 flex-row items-center rounded-full border border-[#60A5FA]/15 bg-[#111A2D] px-6">
-        <Icon size={20} color="#EAF2FF" strokeWidth={2.3} />
-        <Text
-          style={[
-            fontStyle("500"),
-            { color: "#F8FAFC", fontSize: 17, marginLeft: 10 },
-          ]}
+      <View style={{ marginRight: 12 }}>
+        <GlowShell
+          colors={item.colors}
+          radius={999}
+          innerRadius={999}
+          innerBg="#101829"
         >
-          {item.label}
-        </Text>
-      </Pressable>
+          <Pressable
+            style={{
+              height: 64,
+              paddingHorizontal: 24,
+              flexDirection: "row",
+              alignItems: "center",
+              borderRadius: 999,
+            }}
+          >
+            <Icon size={20} color="#F8FBFF" strokeWidth={2.3} />
+            <Text
+              style={[
+                fontStyle("500"),
+                {
+                  color: "#F8FBFF",
+                  fontSize: 17,
+                  marginLeft: 10,
+                },
+              ]}
+            >
+              {item.label}
+            </Text>
+          </Pressable>
+
+          <View
+            style={{
+              position: "absolute",
+              right: -15,
+              top: -10,
+              width: 70,
+              height: 70,
+              borderRadius: 999,
+              backgroundColor: "rgba(96,165,250,0.12)",
+            }}
+          />
+        </GlowShell>
+      </View>
     );
   }
 
   return (
-    <Pressable className="mr-3 h-16 w-16 items-center justify-center rounded-full border border-white/8 bg-[#0F1728]">
-      <Icon size={20} color="#D8E1F0" strokeWidth={2.3} />
-    </Pressable>
+    <View style={{ marginRight: 12 }}>
+      <GlowShell
+        colors={item.colors}
+        radius={999}
+        innerRadius={999}
+        innerBg="#0F1728"
+      >
+        <Pressable
+          style={{
+            width: 64,
+            height: 64,
+            borderRadius: 999,
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          <Icon size={20} color="#DCE6F4" strokeWidth={2.3} />
+        </Pressable>
+
+        <View
+          style={{
+            position: "absolute",
+            left: -12,
+            bottom: -12,
+            width: 52,
+            height: 52,
+            borderRadius: 999,
+            backgroundColor: "rgba(139,92,246,0.08)",
+          }}
+        />
+      </GlowShell>
+    </View>
   );
 }
 
@@ -106,40 +194,114 @@ function PromptCard({ item }: { item: PromptCardItem }) {
   const Icon = item.icon;
 
   return (
-    <Pressable className="mr-4 w-[230px]">
-      <AppShellCard className="px-4 py-4">
-        <View className="flex-row items-center justify-between">
+    <View style={{ width: 240, marginRight: 14 }}>
+      <GlowShell
+        colors={item.colors}
+        radius={30}
+        innerRadius={28}
+        innerBg="#0D1424"
+        outerStyle={{
+          shadowColor: "#7C3AED",
+          shadowOpacity: 0.18,
+          shadowRadius: 18,
+          shadowOffset: { width: 0, height: 10 },
+          elevation: 7,
+        }}
+      >
+        <Pressable style={{ padding: 16, minHeight: 210 }}>
           <View
-            className="h-14 w-14 items-center justify-center rounded-full"
-            style={{ backgroundColor: item.accent }}
+            style={{
+              position: "absolute",
+              right: -22,
+              top: -18,
+              width: 110,
+              height: 110,
+              borderRadius: 999,
+              backgroundColor: "rgba(37,99,235,0.10)",
+            }}
+          />
+          <View
+            style={{
+              position: "absolute",
+              left: -16,
+              bottom: -18,
+              width: 90,
+              height: 90,
+              borderRadius: 999,
+              backgroundColor: "rgba(168,85,247,0.08)",
+            }}
+          />
+
+          <View
+            style={{
+              flexDirection: "row",
+              alignItems: "center",
+              justifyContent: "space-between",
+            }}
           >
-            <Icon size={22} color="#F8FAFC" strokeWidth={2.2} />
+            <View
+              style={{
+                width: 56,
+                height: 56,
+                borderRadius: 999,
+                alignItems: "center",
+                justifyContent: "center",
+                backgroundColor: item.iconBg,
+              }}
+            >
+              <Icon size={22} color="#F8FAFC" strokeWidth={2.2} />
+            </View>
+
+            <GlowShell
+              colors={["#60A5FA", "#8B5CF6", "#22D3EE"]}
+              radius={999}
+              innerRadius={999}
+              innerBg="#121B2E"
+            >
+              <View
+                style={{
+                  width: 48,
+                  height: 48,
+                  borderRadius: 999,
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                <ArrowUpRight size={20} color="#ECF3FF" strokeWidth={2.4} />
+              </View>
+            </GlowShell>
           </View>
 
-          <View className="h-12 w-12 items-center justify-center rounded-full border border-white/8 bg-[#111A2C]">
-            <ArrowUpRight size={20} color="#E5ECF6" strokeWidth={2.4} />
-          </View>
-        </View>
+          <Text
+            style={[
+              fontStyle("700"),
+              {
+                color: "#F8FAFC",
+                fontSize: 18,
+                lineHeight: 24,
+                marginTop: 28,
+              },
+            ]}
+          >
+            {item.title}
+          </Text>
 
-        <Text
-          style={[
-            fontStyle("700"),
-            { color: "#F8FAFC", fontSize: 17, marginTop: 26, lineHeight: 24 },
-          ]}
-        >
-          {item.title}
-        </Text>
-
-        <Text
-          style={[
-            fontStyle("400"),
-            { color: "#95A1B5", fontSize: 13, marginTop: 10, lineHeight: 21 },
-          ]}
-        >
-          {item.subtitle}
-        </Text>
-      </AppShellCard>
-    </Pressable>
+          <Text
+            style={[
+              fontStyle("400"),
+              {
+                color: "#95A1B5",
+                fontSize: 13,
+                lineHeight: 21,
+                marginTop: 10,
+              },
+            ]}
+          >
+            {item.subtitle}
+          </Text>
+        </Pressable>
+      </GlowShell>
+    </View>
   );
 }
 
@@ -147,33 +309,78 @@ function HistoryRow({ item }: { item: HistoryItem }) {
   const Icon = item.icon;
 
   return (
-    <Pressable className="mb-3">
-      <View className="flex-row items-center rounded-[24px] border border-white/8 bg-[#0F1728] px-4 py-4">
-        <View className="mr-4 h-14 w-14 items-center justify-center rounded-full border border-white/8 bg-[#111A2D]">
-          <Icon size={22} color="#EAF2FF" strokeWidth={2.2} />
-        </View>
-
-        <Text
-          style={[
-            fontStyle("400"),
-            { color: "#F3F6FB", fontSize: 15, lineHeight: 23, flex: 1 },
-          ]}
+    <View style={{ marginBottom: 12 }}>
+      <GlowShell
+        colors={item.colors}
+        radius={26}
+        innerRadius={24}
+        innerBg="#0F1728"
+      >
+        <Pressable
+          style={{
+            flexDirection: "row",
+            alignItems: "center",
+            paddingHorizontal: 16,
+            paddingVertical: 16,
+          }}
         >
-          {item.title}
-        </Text>
+          <GlowShell
+            colors={["#60A5FA", "#A855F7", "#22D3EE"]}
+            radius={999}
+            innerRadius={999}
+            innerBg="#111A2D"
+          >
+            <View
+              style={{
+                width: 56,
+                height: 56,
+                borderRadius: 999,
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              <Icon size={22} color="#EAF2FF" strokeWidth={2.2} />
+            </View>
+          </GlowShell>
 
-        <View className="ml-4 h-10 w-10 items-center justify-center rounded-full">
-          <ArrowUpRight size={20} color="#E5ECF6" strokeWidth={2.4} />
-        </View>
-      </View>
-    </Pressable>
+          <Text
+            style={[
+              fontStyle("400"),
+              {
+                color: "#F3F6FB",
+                fontSize: 15,
+                lineHeight: 23,
+                flex: 1,
+                marginLeft: 14,
+                marginRight: 12,
+              },
+            ]}
+          >
+            {item.title}
+          </Text>
+
+          <View
+            style={{
+              width: 40,
+              height: 40,
+              borderRadius: 999,
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            <ArrowUpRight size={20} color="#E5ECF6" strokeWidth={2.4} />
+          </View>
+        </Pressable>
+      </GlowShell>
+    </View>
   );
 }
 
 export default function RoadmapScreen() {
   const { profile } = useLaunchpad();
+  const tabBarHeight = useBottomTabBarHeight();
 
-  const goal = profile?.goal?.trim?.() || "career goal";
+  const goal = profile?.goal?.trim?.() || "your career goal";
 
   const modes: ModeItem[] = [
     {
@@ -181,10 +388,23 @@ export default function RoadmapScreen() {
       label: "Career Chat",
       icon: MessageSquare,
       active: true,
+      colors: ["#60A5FA", "#8B5CF6", "#22D3EE"],
     },
-    { id: "voice", icon: Mic },
-    { id: "image", icon: ImageIcon },
-    { id: "link", icon: Link2 },
+    {
+      id: "voice",
+      icon: Mic,
+      colors: ["#22D3EE", "#60A5FA", "#8B5CF6"],
+    },
+    {
+      id: "image",
+      icon: ImageIcon,
+      colors: ["#8B5CF6", "#EC4899", "#60A5FA"],
+    },
+    {
+      id: "link",
+      icon: Link2,
+      colors: ["#34D399", "#22D3EE", "#60A5FA"],
+    },
   ];
 
   const promptCards: PromptCardItem[] = [
@@ -193,7 +413,8 @@ export default function RoadmapScreen() {
       title: "Let’s talk about your career goal",
       subtitle: `Use AI to shape a clearer path toward ${goal}.`,
       icon: Target,
-      accent: "#102A63",
+      iconBg: "#102A63",
+      colors: ["#60A5FA", "#8B5CF6", "#22D3EE"],
     },
     {
       id: "internship",
@@ -201,7 +422,8 @@ export default function RoadmapScreen() {
       subtitle:
         "Find the right next step based on your current profile and strengths.",
       icon: BriefcaseBusiness,
-      accent: "#0F3B2D",
+      iconBg: "#0F3B2D",
+      colors: ["#22D3EE", "#34D399", "#60A5FA"],
     },
     {
       id: "cv",
@@ -209,7 +431,8 @@ export default function RoadmapScreen() {
       subtitle:
         "Let AI rewrite your work into stronger professional statements.",
       icon: FileText,
-      accent: "#31124E",
+      iconBg: "#31124E",
+      colors: ["#A855F7", "#EC4899", "#60A5FA"],
     },
     {
       id: "courses",
@@ -217,7 +440,8 @@ export default function RoadmapScreen() {
       subtitle:
         "Get course ideas that support your target role and long-term growth.",
       icon: GraduationCap,
-      accent: "#123B72",
+      iconBg: "#123B72",
+      colors: ["#60A5FA", "#22D3EE", "#34D399"],
     },
   ];
 
@@ -226,21 +450,25 @@ export default function RoadmapScreen() {
       id: "1",
       title: "Map out the best courses for my career direction",
       icon: GraduationCap,
+      colors: ["#60A5FA", "#8B5CF6", "#22D3EE"],
     },
     {
       id: "2",
       title: "Find internships that match my current profile",
       icon: BriefcaseBusiness,
+      colors: ["#22D3EE", "#34D399", "#60A5FA"],
     },
     {
       id: "3",
       title: "Rewrite my experience into strong CV bullet points",
       icon: FileText,
+      colors: ["#A855F7", "#EC4899", "#60A5FA"],
     },
     {
       id: "4",
       title: "Help me plan a smarter path before graduation",
       icon: Sparkles,
+      colors: ["#60A5FA", "#A855F7", "#22D3EE"],
     },
   ];
 
@@ -248,43 +476,105 @@ export default function RoadmapScreen() {
     <SafeAreaView edges={["top", "bottom"]} className="flex-1 bg-[#050914]">
       <ScrollView
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ paddingBottom: 140 }}
+        contentContainerStyle={{
+          paddingBottom: tabBarHeight + 120,
+        }}
       >
-        <View className="absolute left-[-50] top-[-30] h-56 w-56 rounded-full bg-[#2563EB]/12" />
-        <View className="absolute right-[-30] top-20 h-48 w-48 rounded-full bg-[#7C3AED]/10" />
-        <View className="absolute left-10 top-[520] h-40 w-40 rounded-full bg-[#0EA5E9]/7" />
+        <View
+          style={{
+            position: "absolute",
+            left: -50,
+            top: -20,
+            width: 220,
+            height: 220,
+            borderRadius: 999,
+            backgroundColor: "rgba(37,99,235,0.12)",
+          }}
+        />
+        <View
+          style={{
+            position: "absolute",
+            right: -20,
+            top: 80,
+            width: 180,
+            height: 180,
+            borderRadius: 999,
+            backgroundColor: "rgba(168,85,247,0.10)",
+          }}
+        />
+        <View
+          style={{
+            position: "absolute",
+            left: 40,
+            top: 540,
+            width: 150,
+            height: 150,
+            borderRadius: 999,
+            backgroundColor: "rgba(34,211,238,0.08)",
+          }}
+        />
+        <View
+          style={{
+            position: "absolute",
+            right: 20,
+            top: 760,
+            width: 120,
+            height: 120,
+            borderRadius: 999,
+            backgroundColor: "rgba(52,211,153,0.07)",
+          }}
+        />
 
-        <View className="px-5 pt-3">
-          {/* Top row */}
-          <View className="mb-8 flex-row items-center justify-between">
+        <View style={{ paddingHorizontal: 20, paddingTop: 12 }}>
+          {/* top */}
+          <View
+            style={{
+              marginBottom: 30,
+              flexDirection: "row",
+              alignItems: "center",
+              justifyContent: "flex-start",
+            }}
+          >
             <LinearGradient
-              colors={["#2563EB", "#7C3AED"]}
+              colors={["#2563EB", "#8B5CF6", "#22D3EE"]}
               start={{ x: 0, y: 0 }}
               end={{ x: 1, y: 1 }}
-              className="h-16 w-16 items-center justify-center rounded-full"
+              style={{
+                width: 68,
+                height: 68,
+                borderRadius: 999,
+                padding: 1.5,
+                shadowColor: "#8B5CF6",
+                shadowOpacity: 0.2,
+                shadowRadius: 18,
+                shadowOffset: { width: 0, height: 8 },
+                elevation: 7,
+              }}
             >
-              <Bot size={28} color="#FFFFFF" strokeWidth={2.2} />
-            </LinearGradient>
-
-            <Pressable className="h-16 w-16 items-center justify-center rounded-full border border-white/8 bg-[#0D1422]">
-              <Bell size={23} color="#F8FAFC" strokeWidth={2.2} />
-
-              <View className="absolute right-1 top-1 h-7 w-7 items-center justify-center rounded-full bg-[#FF6B4A]">
-                <Text
-                  style={[fontStyle("700"), { color: "#FFFFFF", fontSize: 12 }]}
-                >
-                  5
-                </Text>
+              <View
+                style={{
+                  flex: 1,
+                  borderRadius: 999,
+                  backgroundColor: "#0E1526",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                <Bot size={30} color="#FFFFFF" strokeWidth={2.2} />
               </View>
-            </Pressable>
+            </LinearGradient>
           </View>
 
-          {/* Headline */}
-          <View className="mb-8">
+          {/* heading */}
+          <View style={{ marginBottom: 28 }}>
             <Text
               style={[
                 fontStyle("700"),
-                { color: "#F8FAFC", fontSize: 24, lineHeight: 30 },
+                {
+                  color: "#F8FAFC",
+                  fontSize: 26,
+                  lineHeight: 32,
+                },
               ]}
             >
               Hello,{" "}
@@ -298,8 +588,8 @@ export default function RoadmapScreen() {
                 fontStyle("700"),
                 {
                   color: "#F8FAFC",
-                  fontSize: 24,
-                  lineHeight: 32,
+                  fontSize: 26,
+                  lineHeight: 34,
                   marginTop: 4,
                 },
               ]}
@@ -323,46 +613,65 @@ export default function RoadmapScreen() {
             </Text>
           </View>
 
-          {/* Mode chips */}
+          {/* chips */}
           <ScrollView
             horizontal
             showsHorizontalScrollIndicator={false}
-            className="mb-8"
+            style={{ marginBottom: 28 }}
           >
             {modes.map((item) => (
               <ModeChip key={item.id} item={item} />
             ))}
           </ScrollView>
 
-          {/* Prompt cards */}
+          {/* prompt cards */}
           <ScrollView
             horizontal
             showsHorizontalScrollIndicator={false}
-            className="mb-8"
+            style={{ marginBottom: 30 }}
           >
             {promptCards.map((item) => (
               <PromptCard key={item.id} item={item} />
             ))}
           </ScrollView>
 
-          {/* History heading */}
-          <View className="mb-5 flex-row items-center justify-between">
+          {/* heading row */}
+          <View
+            style={{
+              marginBottom: 18,
+              flexDirection: "row",
+              alignItems: "center",
+              justifyContent: "space-between",
+            }}
+          >
             <Text
-              style={[fontStyle("500"), { color: "#F8FAFC", fontSize: 20 }]}
+              style={[
+                fontStyle("500"),
+                {
+                  color: "#F8FAFC",
+                  fontSize: 20,
+                },
+              ]}
             >
               Chat History
             </Text>
 
             <Pressable>
               <Text
-                style={[fontStyle("400"), { color: "#A7B2C4", fontSize: 15 }]}
+                style={[
+                  fontStyle("400"),
+                  {
+                    color: "#A7B2C4",
+                    fontSize: 15,
+                  },
+                ]}
               >
                 See All
               </Text>
             </Pressable>
           </View>
 
-          {/* History list */}
+          {/* history */}
           <View>
             {history.map((item) => (
               <HistoryRow key={item.id} item={item} />
@@ -371,27 +680,56 @@ export default function RoadmapScreen() {
         </View>
       </ScrollView>
 
-      {/* Floating action button */}
-      <Pressable
-        className="absolute bottom-7 right-5 flex-row items-center rounded-full bg-[#2563EB] px-5 py-4"
+      {/* floating action button */}
+      <View
+        pointerEvents="box-none"
         style={{
-          shadowColor: "#2563EB",
-          shadowOpacity: 0.3,
-          shadowRadius: 18,
-          shadowOffset: { width: 0, height: 10 },
-          elevation: 10,
+          position: "absolute",
+          left: 0,
+          right: 0,
+          bottom: tabBarHeight + 14,
+          alignItems: "center",
         }}
       >
-        <Plus size={20} color="#FFFFFF" strokeWidth={2.8} />
-        <Text
-          style={[
-            fontStyle("700"),
-            { color: "#FFFFFF", fontSize: 15, marginLeft: 10 },
-          ]}
+        <GlowShell
+          colors={["#60A5FA", "#8B5CF6", "#22D3EE"]}
+          radius={999}
+          innerRadius={999}
+          innerBg="#2563EB"
+          outerStyle={{
+            shadowColor: "#8B5CF6",
+            shadowOpacity: 0.28,
+            shadowRadius: 20,
+            shadowOffset: { width: 0, height: 10 },
+            elevation: 10,
+          }}
         >
-          New Chat
-        </Text>
-      </Pressable>
+          <Pressable
+            style={{
+              paddingHorizontal: 24,
+              paddingVertical: 16,
+              borderRadius: 999,
+              flexDirection: "row",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            <Plus size={20} color="#FFFFFF" strokeWidth={2.8} />
+            <Text
+              style={[
+                fontStyle("700"),
+                {
+                  color: "#FFFFFF",
+                  fontSize: 15,
+                  marginLeft: 10,
+                },
+              ]}
+            >
+              New Chat
+            </Text>
+          </Pressable>
+        </GlowShell>
+      </View>
     </SafeAreaView>
   );
 }
