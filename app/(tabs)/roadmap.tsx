@@ -523,6 +523,22 @@ export default function RoadmapScreen() {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingBottom: 160 }}
       >
+        <Pressable
+          onPress={() => {}}
+          className="absolute bottom-7 right-5 flex-row items-center rounded-full bg-[#2563EB] px-5 py-4"
+          style={{
+            shadowColor: "#2563EB",
+            shadowOpacity: 0.28,
+            shadowRadius: 18,
+            shadowOffset: { width: 0, height: 8 },
+            elevation: 10,
+          }}
+        >
+          <Plus size={18} color="#FFFFFF" strokeWidth={2.8} />
+          <Text className="ml-2 text-[14px] font-extrabold text-white">
+            Add course
+          </Text>
+        </Pressable>
         <View className="absolute left-[-50] top-[-20] h-56 w-56 rounded-full bg-[#2563EB]/20" />
         <View className="absolute right-[-30] top-24 h-48 w-48 rounded-full bg-[#7C3AED]/10" />
         <View className="absolute left-20 top-[620] h-40 w-40 rounded-full bg-[#0EA5E9]/8" />
