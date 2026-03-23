@@ -4,11 +4,13 @@ import type { LucideIcon } from "lucide-react-native";
 import {
   ArrowRight,
   Bell,
+  Bookmark,
   BriefcaseBusiness,
   ChevronRight,
   FileText,
   Flame,
   GraduationCap,
+  MapPin,
   Menu,
   MessageSquare,
   Microscope,
@@ -29,6 +31,250 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import Svg, { Circle } from "react-native-svg";
 import { useLaunchpad } from "../../src/context/LaunchpadContext";
 
+type OpportunityIcon = "briefcase" | "microscope" | "graduation";
+
+type OpportunityItem = {
+  id: string;
+  title: string;
+  location: string;
+  tags: string[];
+  people: string[];
+  applicants: string;
+  reward: string;
+  rewardLabel: string;
+  route: string;
+  accent: string;
+  iconBg: string;
+  cardColors: [string, string];
+  icon: OpportunityIcon;
+};
+
+function getOpportunityIcon(icon: OpportunityIcon) {
+  switch (icon) {
+    case "briefcase":
+      return BriefcaseBusiness;
+    case "microscope":
+      return Microscope;
+    case "graduation":
+      return GraduationCap;
+  }
+}
+
+function TopOpportunityCard({ item }: { item: OpportunityItem }) {
+  const Icon = getOpportunityIcon(item.icon);
+
+  return (
+    <View
+      style={{
+        width: 320,
+        marginRight: 16,
+        borderRadius: 30,
+        shadowColor: item.accent,
+        shadowOpacity: 0.22,
+        shadowRadius: 18,
+        shadowOffset: { width: 0, height: 10 },
+        elevation: 10,
+      }}
+    >
+      <Pressable
+        onPress={() => router.push(item.route as never)}
+        style={{
+          borderRadius: 30,
+          overflow: "hidden",
+        }}
+      >
+        <LinearGradient
+          colors={item.cardColors}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          className="px-4 py-4"
+          style={{
+            minHeight: 245,
+            borderRadius: 30,
+            borderWidth: 1.2,
+            borderColor: hexToRgba(item.accent, 0.45),
+            backgroundColor: "#101827",
+          }}
+        >
+          {/* soft accent glow spots */}
+          <View
+            pointerEvents="none"
+            style={{
+              position: "absolute",
+              right: -22,
+              top: -14,
+              width: 110,
+              height: 110,
+              borderRadius: 999,
+              backgroundColor: hexToRgba(item.accent, 0.12),
+            }}
+          />
+
+          <View
+            pointerEvents="none"
+            style={{
+              position: "absolute",
+              left: -18,
+              bottom: -18,
+              width: 90,
+              height: 90,
+              borderRadius: 999,
+              backgroundColor: hexToRgba(item.accent, 0.09),
+            }}
+          />
+
+          {/* extra inner glow ring */}
+          <View
+            pointerEvents="none"
+            style={{
+              position: "absolute",
+              inset: 0,
+              borderRadius: 30,
+              borderWidth: 1,
+              borderColor: hexToRgba(item.accent, 0.18),
+            }}
+          />
+
+          {/* top row */}
+          <View className="flex-row items-start justify-between">
+            <View className="mr-3 flex-1 flex-row items-start">
+              <View
+                className="mr-3 h-14 w-14 items-center justify-center rounded-full"
+                style={{
+                  backgroundColor: item.iconBg,
+                  borderWidth: 1,
+                  borderColor: hexToRgba(item.accent, 0.28),
+                }}
+              >
+                <Icon size={24} color={item.accent} strokeWidth={2.2} />
+              </View>
+
+              <View className="flex-1">
+                <Text
+                  style={[fontStyle("700")]}
+                  className="text-[22px] leading-7 text-white"
+                >
+                  {item.title}
+                </Text>
+
+                <View className="mt-1 flex-row items-center">
+                  <MapPin size={15} color="#97A5BA" strokeWidth={2.2} />
+                  <Text
+                    style={[fontStyle("400")]}
+                    className="ml-1 text-[13px] text-[#97A5BA]"
+                  >
+                    {item.location}
+                  </Text>
+                </View>
+              </View>
+            </View>
+
+            <Pressable
+              className="h-12 w-12 items-center justify-center rounded-full"
+              style={{
+                backgroundColor: "rgba(255,255,255,0.05)",
+                borderWidth: 1,
+                borderColor: hexToRgba(item.accent, 0.22),
+              }}
+            >
+              <Bookmark size={20} color="#EAF2FF" strokeWidth={2.2} />
+            </Pressable>
+          </View>
+
+          {/* chips */}
+          <View className="mt-5 flex-row flex-wrap">
+            {item.tags.map((tag, index) => (
+              <View
+                key={index}
+                className="mr-3 mb-2 rounded-full px-4 py-3"
+                style={{
+                  backgroundColor: hexToRgba(item.accent, 0.08),
+                  borderWidth: 1,
+                  borderColor: hexToRgba(item.accent, 0.16),
+                }}
+              >
+                <Text style={[fontStyle("400")]} className="text-[13px]">
+                  <Text style={{ color: "#DCE6F7" }}>{tag}</Text>
+                </Text>
+              </View>
+            ))}
+          </View>
+
+          {/* divider */}
+          <View
+            className="my-4 h-[1px]"
+            style={{ backgroundColor: hexToRgba(item.accent, 0.14) }}
+          />
+
+          {/* bottom row */}
+          <View className="flex-row items-end justify-between">
+            <View className="mr-4 flex-1">
+              <ApplicantStack people={item.people} accent={item.accent} />
+
+              <Text
+                style={[fontStyle("400")]}
+                className="mt-3 text-[14px] text-[#A9B5C7]"
+              >
+                {item.applicants}
+              </Text>
+            </View>
+
+            <View className="items-end">
+              <Text
+                style={[fontStyle("700")]}
+                className="text-[28px] text-white"
+              >
+                {item.reward}
+              </Text>
+              <Text
+                style={[fontStyle("400")]}
+                className="text-[14px] text-[#A9B5C7]"
+              >
+                {item.rewardLabel}
+              </Text>
+            </View>
+          </View>
+        </LinearGradient>
+      </Pressable>
+    </View>
+  );
+}
+
+function ApplicantStack({
+  people,
+  accent,
+}: {
+  people: string[];
+  accent: string;
+}) {
+  return (
+    <View className="flex-row items-center">
+      {people.map((person, index) => {
+        const isPlus = person === "+";
+
+        return (
+          <View
+            key={`${person}-${index}`}
+            className="items-center justify-center rounded-full border-2 border-[#101827]"
+            style={{
+              width: 42,
+              height: 42,
+              marginLeft: index === 0 ? 0 : -10,
+              backgroundColor: isPlus ? "#071325" : "rgba(255,255,255,0.08)",
+            }}
+          >
+            <Text style={[fontStyle("700")]} className="text-[12px]">
+              <Text style={{ color: isPlus ? accent : "#EAF2FF" }}>
+                {person}
+              </Text>
+            </Text>
+          </View>
+        );
+      })}
+    </View>
+  );
+}
+
 function fontStyle(weight: "400" | "500" | "700" = "400") {
   return {
     fontFamily:
@@ -39,6 +285,73 @@ function fontStyle(weight: "400" | "500" | "700" = "400") {
           : "Roboto_400Regular",
   } as const;
 }
+
+function hexToRgba(hex: string, alpha: number) {
+  const cleaned = hex.replace("#", "");
+
+  const full =
+    cleaned.length === 3
+      ? cleaned
+          .split("")
+          .map((char) => char + char)
+          .join("")
+      : cleaned;
+
+  const bigint = parseInt(full, 16);
+  const r = (bigint >> 16) & 255;
+  const g = (bigint >> 8) & 255;
+  const b = bigint & 255;
+
+  return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+}
+
+const topOpportunities = [
+  {
+    id: "1",
+    title: "Frontend Internship",
+    location: "Remote • Ghana",
+    tags: ["Internship", "Remote", "Verified"],
+    people: ["AM", "DK", "JO", "+"],
+    applicants: "124 applicants",
+    reward: "GHS 2.5k",
+    rewardLabel: "monthly",
+    route: "/(tabs)/opportunities",
+    accent: "#4E7BFF",
+    iconBg: "#13305F",
+    cardColors: ["#121A2D", "#10192A"] as [string, string],
+    icon: "briefcase" as const,
+  },
+  {
+    id: "2",
+    title: "Research Assistant",
+    location: "KNUST • Kumasi",
+    tags: ["Research", "On-site", "Lecturer"],
+    people: ["EA", "KM", "AF", "+"],
+    applicants: "38 applicants",
+    reward: "92%",
+    rewardLabel: "match",
+    route: "/(tabs)/opportunities",
+    accent: "#64C7A5",
+    iconBg: "#15382F",
+    cardColors: ["#101D1B", "#0E1718"] as [string, string],
+    icon: "microscope" as const,
+  },
+  {
+    id: "3",
+    title: "Exchange Scholarship",
+    location: "Europe • Hybrid",
+    tags: ["Scholarship", "Hybrid", "Open"],
+    people: ["NA", "TO", "BA", "+"],
+    applicants: "57 interested",
+    reward: "6 days",
+    rewardLabel: "left",
+    route: "/(tabs)/opportunities",
+    accent: "#F4A85D",
+    iconBg: "#3A2414",
+    cardColors: ["#1F1711", "#17120F"] as [string, string],
+    icon: "graduation" as const,
+  },
+];
 
 type QuickAction = {
   id: string;
@@ -1242,10 +1555,10 @@ export default function HomeScreen() {
               />
             </View>
 
-            <View className="mt-5">
+            <View className="mt-8">
               <SectionTitle
                 title="Top opportunities"
-                actionLabel="Refresh"
+                actionLabel="See all"
                 onPress={() => router.push("/(tabs)/opportunities" as never)}
               />
 
@@ -1253,9 +1566,10 @@ export default function HomeScreen() {
                 horizontal
                 showsHorizontalScrollIndicator={false}
                 contentContainerStyle={{ paddingRight: 20 }}
+                className="mt-4"
               >
-                {opportunities.map((item) => (
-                  <OpportunityCard key={item.id} item={item} />
+                {topOpportunities.map((item) => (
+                  <TopOpportunityCard key={item.id} item={item} />
                 ))}
               </ScrollView>
             </View>
