@@ -363,6 +363,36 @@ function ExperienceTrackCard({ item }: { item: ExperienceTrack }) {
   );
 }
 
+function HeroMiniStat({
+  icon: Icon,
+  label,
+  value,
+  accent,
+}: {
+  icon: LucideIcon;
+  label: string;
+  value: string;
+  accent: string;
+}) {
+  return (
+    <View className="mb-3 rounded-[22px] border border-white/8 bg-[#11192B] px-4 py-4">
+      <View
+        className="mb-3 h-10 w-10 items-center justify-center rounded-2xl"
+        style={{ backgroundColor: accent }}
+      >
+        <Icon size={18} color="#EAF2FF" strokeWidth={2.3} />
+      </View>
+
+      <Text className="text-[12px] font-semibold uppercase tracking-[1px] text-[#8D97A9]">
+        {label}
+      </Text>
+      <Text className="mt-1 text-[22px] font-extrabold text-white">
+        {value}
+      </Text>
+    </View>
+  );
+}
+
 export default function RoadmapScreen() {
   const { profile, milestones, electiveSuggestions } = useLaunchpad();
 
@@ -498,87 +528,164 @@ export default function RoadmapScreen() {
         <View className="absolute left-20 top-[620] h-40 w-40 rounded-full bg-[#0EA5E9]/8" />
 
         <View className="px-5 pt-3">
-          {/* Hero */}
+          {/* Hero / Control Header */}
           <LinearGradient
             colors={["#0E1728", "#0D1A36", "#091120"]}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 1 }}
-            className="mb-8 overflow-hidden rounded-[32px] border border-white/10 px-5 py-6"
+            className="mb-8 overflow-hidden rounded-[32px] border border-white/10 px-5 py-5"
           >
-            <View className="absolute right-[-20] top-[-10] h-40 w-40 rounded-full bg-[#3B82F6]/18" />
-            <View className="absolute bottom-[-24] left-[-12] h-28 w-28 rounded-full bg-[#8B5CF6]/10" />
+            <View className="absolute right-[-18] top-[-12] h-40 w-40 rounded-full bg-[#2563EB]/15" />
+            <View className="absolute bottom-[-24] left-[-12] h-28 w-28 rounded-full bg-[#7C3AED]/10" />
+            <View className="absolute right-10 bottom-10 h-20 w-20 rounded-full bg-[#0EA5E9]/10" />
 
-            <View className="mb-4 flex-row items-center self-start rounded-full border border-[#60A5FA]/20 bg-[#0B1430] px-3 py-1.5">
-              <Brain size={14} color="#60A5FA" strokeWidth={2.4} />
-              <Text className="ml-2 text-[12px] font-bold uppercase tracking-[1.5px] text-[#93C5FD]">
-                ROADMAP INTELLIGENCE
-              </Text>
-            </View>
-
-            <Text className="text-[30px] font-extrabold tracking-tight text-white">
-              Career roadmap
-            </Text>
-
-            <Text className="mt-3 text-[15px] leading-7 text-[#A8B3C7]">
-              This is your planning cockpit for courses, milestones, experience,
-              and employability growth from admission to opportunity.
-            </Text>
-
-            <GlassCard className="mt-5 px-4 py-4">
-              <View className="flex-row items-start justify-between">
-                <View className="flex-1 pr-4">
-                  <Text className="text-[12px] font-bold uppercase tracking-[1.2px] text-[#60A5FA]">
-                    Target direction
-                  </Text>
-                  <Text className="mt-2 text-[20px] font-extrabold text-white">
-                    {profile.goal}
-                  </Text>
-                  <Text className="mt-2 text-[14px] leading-6 text-[#94A3B8]">
-                    Focus on building a degree path, verified experience, and
-                    AI-supported opportunities that make you graduate job-ready.
-                  </Text>
-                </View>
-
-                <View className="h-12 w-12 items-center justify-center rounded-2xl bg-[#0F235B]">
-                  <Sparkles size={20} color="#93C5FD" strokeWidth={2.4} />
-                </View>
-              </View>
-            </GlassCard>
-
-            <View className="mt-5 flex-row items-center">
-              <Pressable
-                onPress={() => router.push("/(tabs)/opportunities" as never)}
-                className="mr-3 flex-row items-center rounded-[16px] bg-[#2563EB] px-5 py-3.5"
-              >
-                <Text className="text-[15px] font-extrabold text-white">
-                  Open matches
+            {/* top row */}
+            <View className="flex-row items-center justify-between">
+              <View className="flex-row items-center self-start rounded-full border border-[#60A5FA]/20 bg-[#0B1430] px-3 py-1.5">
+                <Brain size={14} color="#60A5FA" strokeWidth={2.4} />
+                <Text className="ml-2 text-[12px] font-bold uppercase tracking-[1.5px] text-[#93C5FD]">
+                  ROADMAP HUB
                 </Text>
-                <ArrowRight
-                  size={16}
-                  color="#FFFFFF"
-                  strokeWidth={2.5}
-                  style={{ marginLeft: 6 }}
-                />
-              </Pressable>
+              </View>
 
               <Pressable
                 onPress={() => router.push("/(tabs)/cv" as never)}
-                className="flex-row items-center rounded-[16px] border border-white/10 bg-white/5 px-5 py-3.5"
+                className="h-11 w-11 items-center justify-center rounded-2xl border border-white/10 bg-white/5"
               >
-                <FileText size={16} color="#C7D2FE" strokeWidth={2.3} />
-                <Text className="ml-2 text-[15px] font-bold text-[#E2E8F0]">
-                  CV
+                <FileText size={18} color="#C7D2FE" strokeWidth={2.3} />
+              </Pressable>
+            </View>
+
+            {/* heading */}
+            <View className="mt-4">
+              <Text className="text-[30px] font-extrabold tracking-tight text-white">
+                Build your path with clarity
+              </Text>
+
+              <Text className="mt-3 text-[15px] leading-7 text-[#A8B3C7]">
+                Plan courses, track progress, and grow verified experience that
+                moves you from admission to opportunity.
+              </Text>
+            </View>
+
+            {/* quick chips */}
+            <View className="mt-5 flex-row flex-wrap">
+              <Pressable className="mr-3 mb-3 flex-row items-center rounded-full bg-[#2563EB] px-4 py-3">
+                <Plus size={15} color="#FFFFFF" strokeWidth={2.6} />
+                <Text className="ml-2 text-[13px] font-extrabold text-white">
+                  Add course
+                </Text>
+              </Pressable>
+
+              <Pressable className="mr-3 mb-3 flex-row items-center rounded-full border border-white/10 bg-white/5 px-4 py-3">
+                <Target size={15} color="#C7D2FE" strokeWidth={2.4} />
+                <Text className="ml-2 text-[13px] font-bold text-[#E2E8F0]">
+                  Update goal
+                </Text>
+              </Pressable>
+
+              <Pressable
+                onPress={() => router.push("/(tabs)/opportunities" as never)}
+                className="mb-3 flex-row items-center rounded-full border border-white/10 bg-white/5 px-4 py-3"
+              >
+                <ArrowRight size={15} color="#93C5FD" strokeWidth={2.4} />
+                <Text className="ml-2 text-[13px] font-bold text-[#E2E8F0]">
+                  Open matches
                 </Text>
               </Pressable>
             </View>
+
+            {/* main dashboard area */}
+            <View className="mt-2 flex-row">
+              {/* main card */}
+              <View className="mr-3 flex-1 rounded-[28px] border border-white/10 bg-[#0C1528] px-4 py-4">
+                <View className="flex-row items-start justify-between">
+                  <View className="flex-1 pr-3">
+                    <Text className="text-[12px] font-bold uppercase tracking-[1.2px] text-[#60A5FA]">
+                      Target direction
+                    </Text>
+
+                    <Text className="mt-2 text-[22px] font-extrabold text-white">
+                      {profile.goal}
+                    </Text>
+
+                    <Text className="mt-2 text-[14px] leading-6 text-[#94A3B8]">
+                      Stay focused on the right courses, verified activities,
+                      and opportunities that strengthen your career path.
+                    </Text>
+                  </View>
+
+                  <View className="h-12 w-12 items-center justify-center rounded-2xl bg-[#102A63]">
+                    <Sparkles size={20} color="#93C5FD" strokeWidth={2.4} />
+                  </View>
+                </View>
+
+                <View className="mt-5">
+                  <View className="mb-2 flex-row items-center justify-between">
+                    <Text className="text-[13px] font-semibold text-[#94A3B8]">
+                      Readiness progress
+                    </Text>
+                    <Text className="text-[13px] font-extrabold text-[#93C5FD]">
+                      {pathConfidence}%
+                    </Text>
+                  </View>
+
+                  <View className="h-3 overflow-hidden rounded-full bg-white/8">
+                    <View
+                      className="h-3 rounded-full bg-[#2563EB]"
+                      style={{ width: `${pathConfidence}%` }}
+                    />
+                  </View>
+                </View>
+
+                <View className="mt-5 rounded-[20px] border border-white/8 bg-white/5 px-4 py-4">
+                  <View className="flex-row items-center justify-between">
+                    <View className="flex-1 pr-3">
+                      <Text className="text-[12px] font-bold uppercase tracking-[1px] text-[#60A5FA]">
+                        AI next step
+                      </Text>
+                      <Text className="mt-2 text-[15px] font-extrabold text-white">
+                        Add one course this semester
+                      </Text>
+                      <Text className="mt-1 text-[13px] leading-6 text-[#94A3B8]">
+                        A stronger academic trail improves recommendations for
+                        internships, research, and scholarships.
+                      </Text>
+                    </View>
+
+                    <View className="h-11 w-11 items-center justify-center rounded-2xl bg-[#0F3B2D]">
+                      <BookOpen size={18} color="#5EEAD4" strokeWidth={2.3} />
+                    </View>
+                  </View>
+                </View>
+              </View>
+
+              {/* right mini stats */}
+              <View className="w-[34%]">
+                <HeroMiniStat
+                  icon={GraduationCap}
+                  label="Progress"
+                  value={`${degreeProgress}%`}
+                  accent="#102A63"
+                />
+
+                <HeroMiniStat
+                  icon={Target}
+                  label="Matches"
+                  value={`${unlockedMatches}`}
+                  accent="#31124E"
+                />
+
+                <HeroMiniStat
+                  icon={CircleCheckBig}
+                  label="Verified"
+                  value={`${verifiedExperience}`}
+                  accent="#0F3B2D"
+                />
+              </View>
+            </View>
           </LinearGradient>
-
-          {/* Snapshot */}
-          <SectionHeader
-            title="Roadmap snapshot"
-            subtitle="Your current direction, readiness, and unlocked momentum."
-          />
-
+          {/* Key metrics */}
           <View className="mb-6 flex-row flex-wrap justify-between">
             <MetricTile
               icon={GraduationCap}
