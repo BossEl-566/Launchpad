@@ -687,7 +687,7 @@ export default function RoadmapScreen() {
           position: "absolute",
           left: 0,
           right: 0,
-          bottom: tabBarHeight + 50,
+          bottom: tabBarHeight + 90,
           alignItems: "center",
         }}
       >
