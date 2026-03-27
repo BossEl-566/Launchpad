@@ -21,6 +21,10 @@ const conversation = [
     role: "AI Coach",
     text: "Rewrite your internship bullets using numbers. Example: 'Improved dashboard completion rate by 18% through a simplified onboarding flow.'",
   },
+  {
+    role: "You",
+    text: "Thanks AI Coach!",
+  },
 ];
 
 export default function AiCoachScreen() {
